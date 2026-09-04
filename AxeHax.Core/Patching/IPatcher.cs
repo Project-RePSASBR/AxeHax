@@ -4,5 +4,7 @@ namespace AxeHax.Core.Patching;
 
 public interface IPatcher
 {
+    public List<Message> Verify();
+
     public void Patch();
 }

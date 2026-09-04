@@ -1,15 +1,11 @@
 ﻿using AxeHax.Core.Verification;
 using ELFSharp.ELF;
 using ELFSharp.ELF.Segments;
-using System;
 using System.Buffers.Binary;
-using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace AxeHax.Core.Patching;
 
@@ -35,8 +31,6 @@ public partial class EbootPatcher : IPatcher
 
         _patchTarget = FindPatchableElement(stream);
         _ppuHash = new Lazy<string?>(() => GeneratePpuHash(stream));
-        if (_patchTarget == null)
-            throw new ArgumentException("Patchable element not found in provided EBOOT stream!");
     }
 
     public Stream Stream { get; private set;  }
@@ -102,8 +96,58 @@ public partial class EbootPatcher : IPatcher
         return ppuHash;
     }
 
+    /// <summary>
+    ///     Checks the contents of the EBOOT to verify that it is patchable.
+    /// </summary>
+    /// <returns>A list of issues and notes about the EBOOT.</returns>
+    [Pure]
+    public List<Message> Verify()
+    {
+        List<Message> messages = new();
+
+        Stream.Position = 0;
+        State.Logger.LogInfo(LogType.Verify, "Verifying provided EBOOT file");
+
+        try
+        {
+            Class output = ELFReader.CheckELFType(Stream);
+
+            State.Logger.LogDebug(LogType.Verify, $"ELF class: {output}");
+            if (output == Class.NotELF)
+            {
+                messages.Add(new Message(MessageLevel.Error, "EBOOT is not a valid ELF file."));
+                return messages;
+            }
+        }
+        catch (Exception e) when (e is IndexOutOfRangeException or EndOfStreamException)
+        {
+            messages.Add(new Message(MessageLevel.Error, "The EBOOT wasn't big enough to be valid."));
+            return messages;
+        }
+
+        // Only requirement is that we needed to have found $#@!__DecryptPsarcs__!@#$ somewhere in our ELF
+        if (_patchTarget == null)
+            messages.Add(new Message(
+                MessageLevel.Error,
+                $"Could not find patchable element '{_psarcDecryptMarker}' in provided EBOOT. Nothing to patch."
+            ));
+        if (GenerateRpcs3Patch && string.IsNullOrWhiteSpace(_ppuHash.Value))
+            messages.Add(new Message(
+                MessageLevel.Error,
+                """
+                Couldn't determine the PPU hash. This is used by RPCS3 to know which game 
+                the patch is used for. Without it, we cannot continue patching.
+                """
+            ));
+
+        return messages;
+    }
+
     public void Patch()
     {
+        if (_patchTarget == null)
+            throw new ArgumentException("Patchable element string not found in provided EBOOT stream!");
+
         if (GenerateRpcs3Patch)
         {
             Debug.Assert(Rpcs3PatchFolder != null);
@@ -131,7 +175,7 @@ public partial class EbootPatcher : IPatcher
                                             - [ be8, 0x{0}, "0x00" ]
                                       """;
             const long elfLoadOffset = 0x10000;
-            long fileOffset = elfLoadOffset + _patchTarget ?? 0 + _psarcDecryptMarker.Length;
+            long fileOffset = elfLoadOffset + _patchTarget.GetValueOrDefault() + _psarcDecryptMarker.Length;
 
             StringBuilder finalPatch = new();
             finalPatch.AppendLine("");
@@ -142,7 +186,7 @@ public partial class EbootPatcher : IPatcher
         else
         {
             using BinaryWriter writer = new(Stream);
-            writer.BaseStream.Position = _patchTarget ?? 0 + _psarcDecryptMarker.Length;
+            writer.BaseStream.Position = _patchTarget.GetValueOrDefault() + _psarcDecryptMarker.Length;
             writer.Write((byte)0);
         }
     }
