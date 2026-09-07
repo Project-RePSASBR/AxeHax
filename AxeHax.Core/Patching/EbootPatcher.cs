@@ -26,11 +26,11 @@ public partial class EbootPatcher : IPatcher
         if (!stream.CanRead || !stream.CanSeek || !stream.CanWrite)
             throw new ArgumentException("Stream must be readable, seekable and writable", nameof(stream));
 
-        Stream = stream;
-        Stream.Position = 0;
+        this.Stream = stream;
+        this.Stream.Position = 0;
 
-        _patchTarget = FindPatchableElement(stream);
-        _ppuHash = new Lazy<string?>(() => GeneratePpuHash(stream));
+        this._patchTarget = FindPatchableElement(stream);
+        this._ppuHash = new Lazy<string?>(() => GeneratePpuHash(stream));
     }
 
     public Stream Stream { get; private set;  }
@@ -105,7 +105,7 @@ public partial class EbootPatcher : IPatcher
     {
         List<Message> messages = new();
 
-        Stream.Position = 0;
+        this.Stream.Position = 0;
         State.Logger.LogInfo(LogType.Verify, "Verifying provided EBOOT file");
 
         try
@@ -126,12 +126,12 @@ public partial class EbootPatcher : IPatcher
         }
 
         // Only requirement is that we needed to have found $#@!__DecryptPsarcs__!@#$ somewhere in our ELF
-        if (_patchTarget == null)
+        if (this._patchTarget == null)
             messages.Add(new Message(
                 MessageLevel.Error,
                 $"Could not find patchable element '{_psarcDecryptMarker}' in provided EBOOT. Nothing to patch."
             ));
-        if (GenerateRpcs3Patch && string.IsNullOrWhiteSpace(_ppuHash.Value))
+        if (this.GenerateRpcs3Patch && string.IsNullOrWhiteSpace(this._ppuHash.Value))
             messages.Add(new Message(
                 MessageLevel.Error,
                 """
@@ -145,17 +145,17 @@ public partial class EbootPatcher : IPatcher
 
     public void Patch()
     {
-        if (_patchTarget == null)
+        if (this._patchTarget == null)
             throw new ArgumentException("Patchable element string not found in provided EBOOT stream!");
 
-        if (GenerateRpcs3Patch)
+        if (this.GenerateRpcs3Patch)
         {
-            Debug.Assert(Rpcs3PatchFolder != null);
-            Debug.Assert(GameName != null);
-            Debug.Assert(GameVersion != null);
-            Debug.Assert(!string.IsNullOrEmpty(GameVersion));
+            Debug.Assert(this.Rpcs3PatchFolder != null);
+            Debug.Assert(this.GameName != null);
+            Debug.Assert(this.GameVersion != null);
+            Debug.Assert(!string.IsNullOrEmpty(this.GameVersion));
 
-            string patchesFile = Path.Combine(Rpcs3PatchFolder, "imported_patch.yml");
+            string patchesFile = Path.Combine(this.Rpcs3PatchFolder, "imported_patch.yml");
 
             if (!File.Exists(patchesFile))
                 File.WriteAllText(patchesFile, "Version: 1.2\n\n");
@@ -166,7 +166,7 @@ public partial class EbootPatcher : IPatcher
                                    Games:
                                      "{this.GameName.ReplaceLineEndings(string.Empty)}":
                                        {this.TitleId}: [ {this.GameVersion} ]
-                                   Author: "Refresher (automated)"
+                                   Author: "AxeHax (automated)"
                                    Notes: "This patches the retail version of the game to use standard unencrypted PSARCs"
                                    Patch Version:
                                    Patch:
@@ -186,7 +186,7 @@ public partial class EbootPatcher : IPatcher
         else
         {
             using BinaryWriter writer = new(Stream);
-            writer.BaseStream.Position = _patchTarget.GetValueOrDefault() + _psarcDecryptMarker.Length;
+            writer.BaseStream.Position = this._patchTarget.GetValueOrDefault() + _psarcDecryptMarker.Length;
             writer.Write((byte)0);
         }
     }

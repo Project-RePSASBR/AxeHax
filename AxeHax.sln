@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxeHax", "AxeHax\AxeHax.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxeHax.Core", "AxeHax.Core\AxeHax.Core.csproj", "{51DC945B-2395-4E84-8337-065389A88552}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPRXPatcher", "External\SPRXPatcher\SPRXPatcher\SPRXPatcher.csproj", "{7F17CAF2-53AA-F95A-9E88-63731E3E853F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,10 @@ Global
 		{51DC945B-2395-4E84-8337-065389A88552}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51DC945B-2395-4E84-8337-065389A88552}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51DC945B-2395-4E84-8337-065389A88552}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F17CAF2-53AA-F95A-9E88-63731E3E853F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F17CAF2-53AA-F95A-9E88-63731E3E853F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F17CAF2-53AA-F95A-9E88-63731E3E853F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F17CAF2-53AA-F95A-9E88-63731E3E853F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
