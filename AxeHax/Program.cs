@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using CommandLine;
@@ -8,6 +8,7 @@ using AxeHax.Core.Logging;
 using AxeHax.UI;
 using Eto.Forms;
 using NotEnoughLogs.Sinks;
+using AxeHax.Core.Pipelines.Psasbr;
 
 namespace AxeHax;
 
@@ -117,21 +118,15 @@ public class Program
         if (string.IsNullOrWhiteSpace(value))
             InvalidUrl(uriStr);
 
-
-        AutoApplyInformation info = new();
-
         switch (method)
         {
             case "patch":
-                info.AutomaticallyApply = false;
-                info.AutomaticallyDiscover = true;
-                info.ServerUrl = value;
                 switch (target)
                 {
-                    //case "ps3":
-                    //    return new PipelineForm<LbpPS3PatchPipeline>(info);
-                    //case "rpcs3":
-                    //    return new PipelineForm<LbpRPCS3PatchPipeline>(info);
+                    case "ps3":
+                        return new PipelineForm<PsasbrPS3PatchPipeline>();
+                    case "rpcs3":
+                        return new PipelineForm<PsasbrRPCS3PatchPipeline>();
                 }
                 break;
             default:

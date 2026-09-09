@@ -26,6 +26,7 @@ public abstract class Pipeline : IAccessesPlatform
     public GameInformation? GameInformation { get; internal set; }
     public EncryptionDetails? EncryptionDetails { get; internal set; }
 
+    public virtual string? GuideLink => null;
     public virtual string? ShorthandUrlId => null;
 
     public virtual IEnumerable<string> GameNameFilters => [];
