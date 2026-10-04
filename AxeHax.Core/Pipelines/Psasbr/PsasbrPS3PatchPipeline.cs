@@ -1,4 +1,4 @@
-﻿using AxeHax.Core.Pipelines.Steps;
+using AxeHax.Core.Pipelines.Steps;
 
 namespace AxeHax.Core.Pipelines.Psasbr;
 
@@ -27,12 +27,12 @@ public class PsasbrPS3PatchPipeline : Pipeline
         // Decryption and patch stage
         typeof(PrepareSceToolStep),
         typeof(DecryptGameEbootStep),
-        typeof(PrepareEbootPatcherAndVerifyStep),
-        typeof(ApplyPatchToEbootStep),
+        typeof(ApplySprxPatchToEbootStep),
 
         // Encryption and upload stage
         typeof(EncryptGameEbootStep),
         typeof(BackupGameEbootBeforeReplaceStep),
+        typeof(UploadCircleButtonSprxStep),
         typeof(UploadGameEbootStep),
     ];
 }

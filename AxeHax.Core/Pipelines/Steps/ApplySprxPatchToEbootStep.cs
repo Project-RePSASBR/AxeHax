@@ -1,4 +1,4 @@
-﻿using SPRXPatcher.Elf;
+using SPRXPatcher.Elf;
 
 namespace AxeHax.Core.Pipelines.Steps;
 
@@ -22,7 +22,7 @@ public class ApplySprxPatchToEbootStep : Step
         
         this.Progress = 0.5f;
         
-        elf.SprxPath = "/dev_hdd0/plugins/PsasPs3Hooks.sprx";
+        elf.SprxPath = "/dev_hdd0/plugins/CircleButton.sprx";
 
         // writing requires read permissions for PPU hash calculation
         await using FileStream writeStream = File.Open(decryptedEbootPath, FileMode.Open, FileAccess.ReadWrite);

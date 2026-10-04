@@ -9,6 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\CircleButton.sprx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CircleButton.sprx" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ELFSharp" Version="2.17.3" />
     <PackageReference Include="FluentFTP" Version="54.2.0" />
     <PackageReference Include="NotEnoughLogs" Version="2.0.3" />
@@ -18,6 +26,27 @@
 
   <ItemGroup>
     <ProjectReference Include="..\External\SPRXPatcher\SPRXPatcher\SPRXPatcher.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+      <EmbeddedResource Include="Resources/CircleButton.sprx" Condition="Exists('Resources/CircleButton.sprx')">
+          <LogicalName>CircleButton.sprx</LogicalName>
+      </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

@@ -37,7 +37,9 @@ public class MainForm : AxeHaxForm
             this.PipelineButton<PsasbrRPCS3PatchPipeline>("Patch PSASBR for RPCS3"),
 
             new Label { Text = "Advanced (for experts):" },
-            this.PipelineButton<ElfToElfPatchPipeline>(".elf->.elf Patch"),
+            this.PipelineButton<PsasbrPS3NoPsarcEncryptPatchPipeline>("Patch PSASBR for PS3 (with disabled PSARC encryption)"),
+            this.PipelineButton<PsasbrRPCS3NoPsarcEncryptPatchPipeline>("Patch PSASBR for RPCS3 (with disabled PSARC encryption)"),
+            // this.PipelineButton<ElfToElfPatchPipeline>(".elf->.elf Patch"),
 
             #if DEBUG
             new Label { Text = "Debugging options:" },
