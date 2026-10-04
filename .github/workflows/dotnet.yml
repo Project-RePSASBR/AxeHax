@@ -1,0 +1,123 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: Build and Test
+
+on:
+  push:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    name: Build, Test, and Upload Builds (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Set VERSION variable from tag
+      shell: bash
+      run: echo "VERSION=0.0.0" >> $GITHUB_ENV
+      
+    - name: Publish for Linux x64
+      if: matrix.os == 'ubuntu-latest'
+      run: dotnet publish -c Release -r linux-x64 --self-contained AxeHax /p:Version=${VERSION}
+      
+    - name: Publish for Linux ARM64
+      if: matrix.os == 'ubuntu-latest'
+      run: dotnet publish -c Release -r linux-arm64 --self-contained AxeHax /p:Version=${VERSION}
+      
+    - name: Publish for Windows x64
+      if: matrix.os == 'windows-latest'
+      shell: bash
+      run: dotnet publish -c Release -r win-x64 --no-self-contained AxeHax //p:Version=${VERSION}
+
+    - name: Publish for macOS x64
+      if: matrix.os == 'macos-latest'
+      shell: bash
+      run: dotnet publish -c Release -r osx-x64 --self-contained AxeHax /p:Version=${VERSION}
+
+    - name: Publish for macOS ARM64
+      if: matrix.os == 'macos-latest'
+      shell: bash
+      run: dotnet publish -c Release -r osx-arm64 --self-contained AxeHax /p:Version=${VERSION}
+
+    - name: Create macOS universal2 binary
+      if: matrix.os == 'macos-latest'
+      shell: bash
+      working-directory: AxeHax/bin/Release/net9.0/
+      run: |
+        mkdir -p osx-universal2/publish/AxeHax.app/Contents/MacOS
+        cp -r osx-arm64/publish/*.app/Contents/ osx-universal2/publish/AxeHax.app/Contents/
+        for file in $(find osx-arm64/publish/*.app/Contents/MacOS); do
+          if [[ "$(file $file)" == *"Mach-O"* ]]; then
+              if [[ "$(lipo -archs $file)" != *"x86_64 arm64"* ]]; then
+                lipo -create osx-arm64/publish/*.app/Contents/MacOS/$(basename $file) osx-x64/publish/*.app/Contents/MacOS/$(basename $file) -output osx-universal2/publish/AxeHax.app/Contents/MacOS/$(basename $file);
+              fi;
+          fi;
+        done
+        rm -rfv osx-universal2/publish/AxeHax.app/Contents/MacOS/*.app
+        codesign -fs - --deep osx-universal2/publish/AxeHax.app
+      
+    # We need to tarball our macOS and Linux builds, since the ZIP files created by upload-artifact do not retain extended unix file permissions, 
+    # which means the executable bit is lost, which is un-ideal for end users, who will hit weird errors (especially relating to code signing on macOS)
+    - name: 'Tar macOS universal2 build'
+      if: matrix.os == 'macos-latest'
+      working-directory: AxeHax/bin/Release/net9.0/osx-universal2/publish/
+      run: tar -cvf ../../../../../../AxeHax-macOS.tar *.app 
+
+    - name: 'Tar Linux x64'
+      if: matrix.os == 'ubuntu-latest'
+      working-directory: AxeHax/bin/Release/net9.0/linux-x64/publish/
+      run: tar -cvf ../../../../../../AxeHax-x64.tar *
+      
+    - name: 'Tar Linux ARM64'
+      if: matrix.os == 'ubuntu-latest'
+      working-directory: AxeHax/bin/Release/net9.0/linux-arm64/publish/
+      run: tar -cvf ../../../../../../AxeHax-arm64.tar *
+
+    - name: Upload Linux x64 build
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v4
+      with:
+          name: "AxeHax for Linux x64"
+          path: "AxeHax-x64.tar"
+          if-no-files-found: error
+          retention-days: 30
+
+    - name: Upload Linux ARM64 build
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v4
+      with:
+          name: "AxeHax for Linux ARM64"
+          path: "AxeHax-arm64.tar"
+          if-no-files-found: error
+          retention-days: 30
+          
+    - name: Upload Windows x64 build
+      if: matrix.os == 'windows-latest'
+      uses: actions/upload-artifact@v4
+      with:
+          name: "AxeHax for Windows x64"
+          path: "AxeHax/bin/Release/net9.0-windows/win-x64/publish/AxeHax.exe"
+          if-no-files-found: error
+          retention-days: 30
+          
+    - name: Upload macOS universal2 build
+      if: matrix.os == 'macos-latest'
+      uses: actions/upload-artifact@v4
+      with:
+          name: "AxeHax for macOS universal2"
+          path: "AxeHax-macOS.tar"
+          if-no-files-found: error
+          retention-days: 30
