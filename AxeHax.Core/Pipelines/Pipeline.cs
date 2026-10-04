@@ -52,6 +52,7 @@ public abstract class Pipeline : IAccessesPlatform
 
     protected virtual Type? SetupAccessorStepType => null;
     public virtual bool ReplacesEboot => false;
+    public virtual bool UsesPsarcEncryption => true;
 
     protected abstract List<Type> StepTypes { get; }
     private List<Step> _steps = [];

@@ -16,7 +16,7 @@ public class PrepareEbootPatchCreatorAndVerifyStep : Step
     public override float Progress { get; protected set; }
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
-        EbootPatcher patcher = new(File.Open(this.Game.DecryptedEbootPath!, FileMode.Open, FileAccess.ReadWrite));
+        EbootPatcher patcher = new(File.Open(this.Game.DecryptedEbootPath!, FileMode.Open, FileAccess.ReadWrite), !this.Pipeline.UsesPsarcEncryption);
         patcher.GenerateRpcs3Patch = true;
         patcher.Rpcs3PatchFolder = Path.GetFullPath(Path.Combine(this.Pipeline.Inputs["hdd0-path"], "..", "patches"));
         patcher.TitleId = this.Game.TitleId;

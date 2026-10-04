@@ -9,6 +9,7 @@ public class PsasbrPS3PatchPipeline : Pipeline
 
     protected override Type SetupAccessorStepType => typeof(SetupPS3AccessorStep);
     public override bool ReplacesEboot => true;
+    public override bool UsesPsarcEncryption => true;
 
     public override string? ShorthandUrlId => "ps3";
 
@@ -27,6 +28,8 @@ public class PsasbrPS3PatchPipeline : Pipeline
         // Decryption and patch stage
         typeof(PrepareSceToolStep),
         typeof(DecryptGameEbootStep),
+        typeof(PrepareEbootPatcherAndVerifyStep),
+        typeof(ApplyPatchToEbootStep),
         typeof(ApplySprxPatchToEbootStep),
 
         // Encryption and upload stage

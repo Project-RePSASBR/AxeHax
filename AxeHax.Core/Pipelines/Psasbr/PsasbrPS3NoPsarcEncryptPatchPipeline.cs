@@ -9,6 +9,7 @@ public class PsasbrPS3NoPsarcEncryptPatchPipeline : Pipeline
 
     protected override Type SetupAccessorStepType => typeof(SetupPS3AccessorStep);
     public override bool ReplacesEboot => true;
+    public override bool UsesPsarcEncryption => false;
 
     public override string? ShorthandUrlId => "ps3";
 

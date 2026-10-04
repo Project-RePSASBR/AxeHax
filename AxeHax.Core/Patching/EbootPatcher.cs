@@ -1,4 +1,4 @@
-﻿using AxeHax.Core.Verification;
+using AxeHax.Core.Verification;
 using ELFSharp.ELF;
 using ELFSharp.ELF.Segments;
 using System.Buffers.Binary;
@@ -12,8 +12,11 @@ namespace AxeHax.Core.Patching;
 public partial class EbootPatcher : IPatcher
 {
     private const string _psarcDecryptMarker = "$#@!__DecryptPsarcs__!@#$";
-    private readonly long? _patchTarget = null;
+    private const string _arcInfoMarker = "$#@!__ArcInfo__!@#$";
+    private readonly long? _decryptPatchTarget = null;
+    private readonly long? _arcInfoPatchTarget = null;
     private readonly Lazy<string?> _ppuHash = null;
+    private bool _isDisposed = false;
 
     public bool GenerateRpcs3Patch = false;
     public string? Rpcs3PatchFolder = null;
@@ -21,23 +24,25 @@ public partial class EbootPatcher : IPatcher
     public string? GameName;
     public string? TitleId;
 
-    public EbootPatcher(Stream stream)
+    public EbootPatcher(Stream stream, bool noEncryptPsarcs)
     {
         if (!stream.CanRead || !stream.CanSeek || !stream.CanWrite)
             throw new ArgumentException("Stream must be readable, seekable and writable", nameof(stream));
 
         this.Stream = stream;
         this.Stream.Position = 0;
+        this.NoEncryptPsarcs = noEncryptPsarcs;
 
-        this._patchTarget = FindPatchableElement(stream);
+        this._arcInfoPatchTarget = FindPatchableElement(stream, _arcInfoMarker);
+        if (this.NoEncryptPsarcs)
+            this._decryptPatchTarget = FindPatchableElement(stream, _psarcDecryptMarker);
         this._ppuHash = new Lazy<string?>(() => GeneratePpuHash(stream));
     }
 
     public Stream Stream { get; private set;  }
+    public bool NoEncryptPsarcs { get; private set; }
 
-    // $#@!__DecryptPsarcs__!@#$
-
-    private static long? FindPatchableElement(Stream file)
+    private static long? FindPatchableElement(Stream file, string patchMarker)
     {
         long? patchTarget = null;
         long start = Stopwatch.GetTimestamp();
@@ -45,7 +50,7 @@ public partial class EbootPatcher : IPatcher
         BufferedStream bufferedStream = new(file, 4 * 1024);
         BinaryReader reader = new(bufferedStream);
         Span<byte> buffer = new byte[4 * 1024];
-        byte[] markerBytes = Encoding.UTF8.GetBytes(_psarcDecryptMarker);
+        byte[] markerBytes = Encoding.UTF8.GetBytes(patchMarker);
 
         int ebootOffset = 0;
         int bytesRead = reader.Read(buffer);
@@ -125,8 +130,12 @@ public partial class EbootPatcher : IPatcher
             return messages;
         }
 
-        // Only requirement is that we needed to have found $#@!__DecryptPsarcs__!@#$ somewhere in our ELF
-        if (this._patchTarget == null)
+        if (this._arcInfoPatchTarget == null)
+            messages.Add(new Message(
+                MessageLevel.Error,
+                $"Could not find patchable element '{_arcInfoMarker}' in provided EBOOT. Nothing to patch."
+            ));
+        if (this.NoEncryptPsarcs && this._decryptPatchTarget == null)
             messages.Add(new Message(
                 MessageLevel.Error,
                 $"Could not find patchable element '{_psarcDecryptMarker}' in provided EBOOT. Nothing to patch."
@@ -145,8 +154,10 @@ public partial class EbootPatcher : IPatcher
 
     public void Patch()
     {
-        if (this._patchTarget == null)
-            throw new ArgumentException("Patchable element string not found in provided EBOOT stream!");
+        if (this._arcInfoPatchTarget == null)
+            throw new ArgumentException("ArcInfo patchable element string not found in provided EBOOT stream!");
+        if (this.NoEncryptPsarcs && this._decryptPatchTarget == null)
+            throw new ArgumentException("DecryptPsarcs patchable element string not found in provided EBOOT stream!");
 
         if (this.GenerateRpcs3Patch)
         {
@@ -160,34 +171,69 @@ public partial class EbootPatcher : IPatcher
             if (!File.Exists(patchesFile))
                 File.WriteAllText(patchesFile, "Version: 1.2\n\n");
 
-            string template = $"""
-                               PPU-{this._ppuHash}:
-                                 "AxeHax PSARC Decryption Patch":
-                                   Games:
-                                     "{this.GameName.ReplaceLineEndings(string.Empty)}":
-                                       {this.TitleId}: [ {this.GameVersion} ]
-                                   Author: "AxeHax (automated)"
-                                   Notes: "This patches the retail version of the game to use standard unencrypted PSARCs"
-                                   Patch Version:
-                                   Patch:
-                               """;
-            string strPatchTemplate = """
-                                            - [ be8, 0x{0}, "0x00" ]
-                                      """;
             const long elfLoadOffset = 0x10000;
-            long fileOffset = elfLoadOffset + _patchTarget.GetValueOrDefault() + _psarcDecryptMarker.Length;
+            long fileOffset = elfLoadOffset + _arcInfoPatchTarget.GetValueOrDefault() + _arcInfoMarker.Length;
+            string arcInfoPatchTemplate = $"""
+                                             "AxeHax arc.info Patch":
+                                               Games:
+                                                 "{this.GameName.ReplaceLineEndings(string.Empty)}":
+                                                   {this.TitleId}: [ {this.GameVersion} ]
+                                               Author: "AxeHax (automated)"
+                                               Notes: "This patches the game to use a custom arc.info file instead of the one typically baked into the EBOOT"
+                                               Patch Version:
+                                               Patch:
+                                                 - [ string, 0x{fileOffset.ToString("x8")}, "NOT_STAMPED\0" ]
+                                           """;
 
             StringBuilder finalPatch = new();
             finalPatch.AppendLine("");
-            finalPatch.AppendLine(template);
-            finalPatch.AppendLine(string.Format(strPatchTemplate, fileOffset.ToString("x8")));
+            finalPatch.AppendLine($"PPU-{this._ppuHash}:");
+            finalPatch.AppendLine(arcInfoPatchTemplate);
+
+            if (this.NoEncryptPsarcs)
+            {
+                string disableEncryptTemplate = $"""
+                                             "AxeHax disable PSARC encryption/decryption Patch":
+                                               Games:
+                                                 "{this.GameName.ReplaceLineEndings(string.Empty)}":
+                                                   {this.TitleId}: [ {this.GameVersion} ]
+                                               Author: "AxeHax (automated)"
+                                               Notes: "This patches the game so that it can use standard unencrypted PSARCs instead of encrypted PSARCs used in the retail release"
+                                               Patch Version:
+                                               Patch:
+                                           """;
+                string strPatchTemplate = """
+                                            - [ be8, 0x{0}, "0x00" ]
+                                      """;
+
+                fileOffset = fileOffset = elfLoadOffset + _decryptPatchTarget.GetValueOrDefault() + _psarcDecryptMarker.Length;
+                finalPatch.AppendLine(disableEncryptTemplate);
+                finalPatch.AppendLine(string.Format(strPatchTemplate, fileOffset.ToString("x8")));
+            }
+
             File.AppendAllText(patchesFile, finalPatch.ToString());
         }
         else
         {
             using BinaryWriter writer = new(Stream);
-            writer.BaseStream.Position = this._patchTarget.GetValueOrDefault() + _psarcDecryptMarker.Length;
+            writer.BaseStream.Position = this._arcInfoPatchTarget.GetValueOrDefault() + _arcInfoMarker.Length;
+            writer.Write("NOT_STAMPED");
             writer.Write((byte)0);
+
+            if (this.NoEncryptPsarcs)
+            {
+                writer.BaseStream.Position = this._decryptPatchTarget.GetValueOrDefault() + _psarcDecryptMarker.Length;
+                writer.Write((byte)0);
+            }
         }
+    }
+
+    public void Dispose()
+    {
+        if (this._isDisposed)
+            return;
+
+        this.Stream.Dispose();
+        this._isDisposed = true;
     }
 }

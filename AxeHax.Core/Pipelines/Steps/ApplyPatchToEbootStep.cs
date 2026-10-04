@@ -9,6 +9,7 @@ public class ApplyPatchToEbootStep : Step
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         this.Pipeline.Patcher!.Patch();
+        this.Pipeline.Patcher!.Dispose();
         return Task.CompletedTask;
     }
 }

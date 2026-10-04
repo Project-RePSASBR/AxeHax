@@ -9,6 +9,7 @@ public class PsasbrRPCS3NoPsarcEncryptPatchPipeline : Pipeline
 
     protected override Type SetupAccessorStepType => typeof(SetupEmulatorAccessorStep);
     public override bool ReplacesEboot => true;
+    public override bool UsesPsarcEncryption => false;
 
     public override string? ShorthandUrlId => "rpcs3";
 
@@ -26,7 +27,7 @@ public class PsasbrRPCS3NoPsarcEncryptPatchPipeline : Pipeline
         // Decryption and patch stage
         typeof(PrepareSceToolStep),
         typeof(DecryptGameEbootStep),
-        typeof(PrepareEbootPatcherAndVerifyStep),
+        typeof(PrepareEbootPatchCreatorAndVerifyStep),
         typeof(ApplyPatchToEbootStep),
         typeof(ApplySprxPatchToEbootStep),
 
