@@ -20,7 +20,7 @@ public class ValidateGameStep : Step
         string gamePath = $"game/{titleId}";
 
         // sanity check. UI will not allow this to happen, but CLI will
-        if (titleId.Length != "NPUA80662".Length)
+        if (titleId.Length != "BCUS98472".Length)
             this.Fail("Title ID does not match expected length. Did you type the ID in correctly?");
 
         if (!this.Pipeline.Accessor!.DirectoryExists(gamePath))

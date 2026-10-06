@@ -27,9 +27,9 @@ public class PsasbrRPCS3PatchPipeline : Pipeline
         // Decryption and patch stage
         typeof(PrepareSceToolStep),
         typeof(DecryptGameEbootStep),
-        typeof(PrepareEbootPatchCreatorAndVerifyStep),
-        typeof(ApplyPatchToEbootStep),
         typeof(ApplySprxPatchToEbootStep),
+        typeof(PrepareEbootPatcherAndVerifyStep),
+        typeof(ApplyPatchToEbootStep),
 
         // Encryption and upload stage
         typeof(FakeEncryptGameEbootStep),
