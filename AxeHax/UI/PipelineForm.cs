@@ -75,9 +75,9 @@ public class PipelineForm<TPipeline> : AxeHaxForm, IAccessesPlatform where TPipe
         this.InitializePipeline();
         this.InitializeFormStateUpdater();
 
-        if (this._pipeline?.ReplacesEboot ?? false)
+        if (this._pipeline != null && this._pipeline.ReplacesEboot && this._pipeline.ReplacesPatchPsarc)
         {
-            this._revertButton = new Button(this.OnRevertEbootClick) { Text = "Revert Patch" };
+            this._revertButton = new Button(this.OnRevertPatchClick) { Text = "Revert Patch" };
             layout.Items.Insert(2, this._revertButton);
         }
 
@@ -338,7 +338,7 @@ public class PipelineForm<TPipeline> : AxeHaxForm, IAccessesPlatform where TPipe
         this.Platform.OpenUrl(new Uri(url));
     }
 
-    private void OnRevertEbootClick(object? sender, EventArgs e)
+    private void OnRevertPatchClick(object? sender, EventArgs e)
     {
         if (this._pipeline == null)
             return;
@@ -353,9 +353,10 @@ public class PipelineForm<TPipeline> : AxeHaxForm, IAccessesPlatform where TPipe
             try
             {
                 await this._pipeline!.RevertGameEbootAsync();
+                await this._pipeline.RevertGamePatchPsarcAsync();
                 await Application.Instance.InvokeAsync(() =>
                 {
-                    MessageBox.Show("The EBOOT was successfully reverted to the original copy.", "Success!");
+                    MessageBox.Show("The EBOOT and patch.psarc were successfully reverted to the original copies.", "Success!");
                 });
             }
             catch (Exception ex)

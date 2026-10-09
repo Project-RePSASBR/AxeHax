@@ -9,6 +9,7 @@ public class PsasbrPS3NoPsarcEncryptPatchPipeline : Pipeline
 
     protected override Type SetupAccessorStepType => typeof(SetupPS3AccessorStep);
     public override bool ReplacesEboot => true;
+    public override bool ReplacesPatchPsarc => true;
     public override bool UsesPsarcEncryption => false;
 
     public override string? ShorthandUrlId => "ps3";
@@ -35,7 +36,10 @@ public class PsasbrPS3NoPsarcEncryptPatchPipeline : Pipeline
         // Encryption and upload stage
         typeof(EncryptGameEbootStep),
         typeof(BackupGameEbootBeforeReplaceStep),
+        typeof(BackupPatchPsarcBeforeReplaceStep),
         typeof(UploadCircleButtonSprxStep),
         typeof(UploadGameEbootStep),
+        typeof(UploadGameArcInfoStep),
+        typeof(UploadPatchPsarcStep),
     ];
 }

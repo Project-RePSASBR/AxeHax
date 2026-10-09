@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\arc.info" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ELFSharp" Version="2.17.3" />
     <PackageReference Include="FluentFTP" Version="54.2.0" />
     <PackageReference Include="NotEnoughLogs" Version="2.0.3" />
@@ -23,6 +27,9 @@
     <ItemGroup>
         <EmbeddedResource Include="Resources/CircleButton.sprx" Condition="Exists('Resources/CircleButton.sprx')">
             <LogicalName>CircleButton.sprx</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Resources/arc.info" Condition="Exists('Resources/arc.info')">
+            <LogicalName>arc.info</LogicalName>
         </EmbeddedResource>
     </ItemGroup>
 

@@ -52,6 +52,8 @@ public abstract class Pipeline : IAccessesPlatform
 
     protected virtual Type? SetupAccessorStepType => null;
     public virtual bool ReplacesEboot => false;
+    public virtual bool ReplacesPatchPsarc => false;
+
     public virtual bool UsesPsarcEncryption => true;
 
     protected abstract List<Type> StepTypes { get; }
@@ -262,6 +264,31 @@ public abstract class Pipeline : IAccessesPlatform
             (Step)Activator.CreateInstance(this.SetupAccessorStepType, this)!,
             new ValidateGameStep(this),
             new RevertGameEbootFromBackupStep(this),
+        ];
+        
+        this.State = PipelineState.Running;
+        
+        await this.RunListOfSteps(stepTypes, cancellationToken);
+        
+        this.Reset();
+    }
+
+    public async Task RevertGamePatchPsarcAsync(CancellationToken cancellationToken = default)
+    {
+        if (this.State != PipelineState.NotStarted)
+        {
+            this.State = PipelineState.Error;
+            throw new InvalidOperationException("Pipeline must be in a clean state before reverting the patch.psarc.");
+        }
+        
+        if(this.SetupAccessorStepType == null)
+            throw new InvalidOperationException("This pipeline doesn't have accessors configured.");
+        if (!this.ReplacesPatchPsarc)
+            throw new InvalidOperationException("This pipeline doesn't replace the patch.psarc, so this operation is unnecessary.");
+        List<Step> stepTypes = [
+            (Step)Activator.CreateInstance(this.SetupAccessorStepType, this)!,
+            new ValidateGameStep(this),
+            new RevertPatchPsarcFromBackupStep(this),
         ];
         
         this.State = PipelineState.Running;
