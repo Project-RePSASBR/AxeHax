@@ -8,7 +8,6 @@ public class DelayOneSecondStep : Step
     {
     }
 
-    public override float Progress { get; protected set; }
 
     public override async Task ExecuteAsync(CancellationToken cancellationToken = default)
     {

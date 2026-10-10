@@ -1,4 +1,4 @@
-﻿// This file contains modified & ported code from jjolano's make_fself C project.
+// This file contains modified & ported code from jjolano's make_fself C project.
 // make_fself is licensed under GPL-3.0.
 // Find it here: https://github.com/jjolano/make_fself
 
@@ -44,7 +44,6 @@ public class FakeEncryptGameEbootStep : Step
         stream.Write(buffer);
     }
 
-    public override float Progress { get; protected set; }
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         State.Logger.LogDebug(Encrypt, "Loading ELF to memory...");

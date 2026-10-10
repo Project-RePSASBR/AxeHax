@@ -352,8 +352,7 @@ public class PipelineForm<TPipeline> : AxeHaxForm, IAccessesPlatform where TPipe
         {
             try
             {
-                await this._pipeline!.RevertGameEbootAsync();
-                await this._pipeline.RevertGamePatchPsarcAsync();
+                await this._pipeline!.RevertGamePatchAsync();
                 await Application.Instance.InvokeAsync(() =>
                 {
                     MessageBox.Show("The EBOOT and patch.psarc were successfully reverted to the original copies.", "Success!");

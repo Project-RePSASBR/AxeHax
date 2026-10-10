@@ -7,7 +7,6 @@ public class RevertPatchPsarcFromBackupStep : Step
     public RevertPatchPsarcFromBackupStep(Pipeline pipeline) : base(pipeline)
     { }
 
-    public override float Progress { get; protected set; }
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         PatchAccessor.Try(this, () =>
@@ -33,7 +32,7 @@ public class RevertPatchPsarcFromBackupStep : Step
             }
 
             this.Progress = 0.75f;
-            this.Pipeline.Accessor.CopyFile(backup, psarc);
+            this.Pipeline.Accessor.MoveFile(backup, psarc);
         });
 
         this.Progress = 1.0f;

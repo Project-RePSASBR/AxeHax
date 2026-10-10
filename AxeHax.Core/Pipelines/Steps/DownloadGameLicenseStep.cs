@@ -7,7 +7,6 @@ public class DownloadGameLicenseStep : Step
     public DownloadGameLicenseStep(Pipeline pipeline) : base(pipeline)
     {}
 
-    public override float Progress { get; protected set; }
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         GameInformation game = this.Game;

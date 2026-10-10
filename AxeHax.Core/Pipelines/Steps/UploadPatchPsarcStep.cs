@@ -8,15 +8,16 @@ public class UploadPatchPsarcStep : Step
 {
     public UploadPatchPsarcStep(Pipeline pipeline) : base(pipeline)
     { }
-    public override float Progress { get; protected set; }
+
     public override async Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         await PatchAccessor.TryAsync(this, async () =>
         {
             string titleId = this.Game.TitleId;
-            string usrDir = $"game/{titleId}/USRDIR";
+            string usrDir = $"game/{titleId}/USRDIR/";
             const string psarcName = "patch.psarc";
-            string psarcPath = usrDir + psarcName;
+
+            string psarcPath = Path.Combine(usrDir, psarcName);
 
             if (this.Pipeline.Accessor!.FileExists(psarcPath))
                 this.Pipeline.Accessor.RemoveFile(psarcPath);
@@ -25,7 +26,8 @@ public class UploadPatchPsarcStep : Step
 
             if (File.Exists(psarcName))
             {
-                this.Pipeline.Accessor.UploadFile(psarcName, psarcPath);
+                await this.Pipeline.Accessor.UploadFileWithProgressAsync(
+                    psarcName, psarcPath, this, cancellationToken);
             }
             else
             {

@@ -1,4 +1,4 @@
-﻿using FluentFTP;
+using FluentFTP;
 using AxeHax.Core.Exceptions;
 
 namespace AxeHax.Core.Accessors;
@@ -121,6 +121,11 @@ public class ConsolePatchAccessor : PatchAccessor, IDisposable
         // technically we can use a stream directly but this uses a lot more requests
         // and webman doesnt like that, it tends to just slow down to a crawl after a bunch of them :(
         // return this._client.OpenRead(GetPath(path));
+    }
+
+    public override void MoveFile(string inPath, string outPath)
+    {
+        this._client.MoveFile(GetPath(inPath), GetPath(outPath), FtpRemoteExists.Overwrite);
     }
 
     public override Stream OpenWrite(string path) => this._client.OpenWrite(GetPath(path), FtpDataType.Binary, false);

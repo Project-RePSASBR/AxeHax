@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using AxeHax.Core.Pipelines;
 
 namespace AxeHax.Core.Accessors;
@@ -41,6 +41,12 @@ public abstract class PatchAccessor
         using Stream outStream = this.OpenWrite(outPath);
 
         inStream.CopyTo(outStream);
+    }
+
+    public virtual void MoveFile(string inPath, string outPath)
+    {
+        this.CopyFile(inPath, outPath);
+        this.RemoveFile(inPath);
     }
 
     /// <summary>

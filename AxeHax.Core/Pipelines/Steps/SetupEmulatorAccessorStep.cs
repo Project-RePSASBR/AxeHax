@@ -7,7 +7,6 @@ public class SetupEmulatorAccessorStep : Step
     public SetupEmulatorAccessorStep(Pipeline pipeline) : base(pipeline)
     {}
 
-    public override float Progress { get; protected set; }
 
     public override List<StepInput> Inputs { get; } = [
         CommonStepInputs.RPCS3Folder,
@@ -17,7 +16,6 @@ public class SetupEmulatorAccessorStep : Step
     {
         string path = this.Inputs[0].GetValueFromPipeline(this.Pipeline);
 
-        // https://littlebigrefresh.sentry.io/issues/6636592943
         if (path.StartsWith("search-ms:"))
             return this.Fail(
                 "The path you entered is a Windows search link. " +

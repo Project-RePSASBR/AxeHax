@@ -1,4 +1,4 @@
-﻿using SCEToolSharp;
+using SCEToolSharp;
 
 namespace AxeHax.Core.Pipelines.Steps;
 
@@ -7,7 +7,6 @@ public class EncryptGameEbootStep : Step
     public EncryptGameEbootStep(Pipeline pipeline) : base(pipeline)
     {}
 
-    public override float Progress { get; protected set; }
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         if (this.Game.ShouldUseNpdrmEncryption ?? this.Game.TitleId.StartsWith('N'))

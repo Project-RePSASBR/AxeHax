@@ -1,4 +1,4 @@
-﻿using AxeHax.Core.Accessors;
+using AxeHax.Core.Accessors;
 
 namespace AxeHax.Core.Pipelines.Steps;
 
@@ -8,13 +8,12 @@ public class UploadGameEbootStep : Step
     {
     }
 
-    public override float Progress { get; protected set; }
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
-        PatchAccessor.Try(this, () =>
+        PatchAccessor.Try(this, async () =>
         {
             string titleId = this.Game.TitleId;
-            string usrDir = $"game/{titleId}/USRDIR";
+            string usrDir = $"game/{titleId}/USRDIR/";
         
             string eboot = Path.Combine(usrDir, "EBOOT.BIN");
             
@@ -22,8 +21,9 @@ public class UploadGameEbootStep : Step
                 this.Pipeline.Accessor.RemoveFile(eboot);
 
             this.Progress = 0.5f;
-            
-            this.Pipeline.Accessor.UploadFile(this.Game.EncryptedEbootPath!, eboot);
+
+            await this.Pipeline.Accessor.UploadFileWithProgressAsync(
+                this.Game.EncryptedEbootPath!, eboot, this, cancellationToken);
         });
 
         return Task.CompletedTask;

@@ -6,7 +6,6 @@ namespace AxeHax.Core.Pipelines;
 public abstract class Step : IAccessesPlatform
 {
     protected Pipeline Pipeline { get; }
-    public abstract float Progress { get; protected set; }
 
     public virtual List<StepInput> Inputs { get; } = [];
 
@@ -22,6 +21,7 @@ public abstract class Step : IAccessesPlatform
 
     public IPlatformInterface Platform => this.Pipeline.Platform;
 
+    public float Progress { get; set; }
     protected bool Failed { get; private set; }
 
     public Task Fail(string reason)

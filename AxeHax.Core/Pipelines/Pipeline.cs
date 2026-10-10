@@ -246,12 +246,12 @@ public abstract class Pipeline : IAccessesPlatform
         this.Reset();
     }
     
-    public async Task RevertGameEbootAsync(CancellationToken cancellationToken = default)
+    public async Task RevertGamePatchAsync(CancellationToken cancellationToken = default)
     {
         if (this.State != PipelineState.NotStarted)
         {
             this.State = PipelineState.Error;
-            throw new InvalidOperationException("Pipeline must be in a clean state before reverting the EBOOT.");
+            throw new InvalidOperationException("Pipeline must be in a clean state before reverting the game patch.");
         }
         
         if(this.SetupAccessorStepType == null)
@@ -259,35 +259,13 @@ public abstract class Pipeline : IAccessesPlatform
 
         if (!this.ReplacesEboot)
             throw new InvalidOperationException("This pipeline doesn't replace the EBOOT, so this operation is unnecessary.");
+        if (!this.ReplacesPatchPsarc)
+            throw new InvalidOperationException("This pipeline doesn't replace patch.psarc, so this operation is unnecessary.");
 
         List<Step> stepTypes = [
             (Step)Activator.CreateInstance(this.SetupAccessorStepType, this)!,
             new ValidateGameStep(this),
             new RevertGameEbootFromBackupStep(this),
-        ];
-        
-        this.State = PipelineState.Running;
-        
-        await this.RunListOfSteps(stepTypes, cancellationToken);
-        
-        this.Reset();
-    }
-
-    public async Task RevertGamePatchPsarcAsync(CancellationToken cancellationToken = default)
-    {
-        if (this.State != PipelineState.NotStarted)
-        {
-            this.State = PipelineState.Error;
-            throw new InvalidOperationException("Pipeline must be in a clean state before reverting the patch.psarc.");
-        }
-        
-        if(this.SetupAccessorStepType == null)
-            throw new InvalidOperationException("This pipeline doesn't have accessors configured.");
-        if (!this.ReplacesPatchPsarc)
-            throw new InvalidOperationException("This pipeline doesn't replace the patch.psarc, so this operation is unnecessary.");
-        List<Step> stepTypes = [
-            (Step)Activator.CreateInstance(this.SetupAccessorStepType, this)!,
-            new ValidateGameStep(this),
             new RevertPatchPsarcFromBackupStep(this),
         ];
         

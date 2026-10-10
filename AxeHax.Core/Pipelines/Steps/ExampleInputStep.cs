@@ -8,7 +8,6 @@ public class ExampleInputStep : Step
     {
     }
 
-    public override float Progress { get; protected set; }
 
     public override List<StepInput> Inputs { get; } =
     [

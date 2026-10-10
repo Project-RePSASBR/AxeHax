@@ -1,4 +1,4 @@
-﻿using AxeHax.Core.Accessors;
+using AxeHax.Core.Accessors;
 using AxeHax.Core.Patching;
 
 namespace AxeHax.Core.Pipelines.Steps;
@@ -8,7 +8,6 @@ public class DownloadGameListStep : Step
     public DownloadGameListStep(Pipeline pipeline) : base(pipeline)
     {}
 
-    public override float Progress { get; protected set; }
     public override async Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         this.Pipeline.GameList = [];

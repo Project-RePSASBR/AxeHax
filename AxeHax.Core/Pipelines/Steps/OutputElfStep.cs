@@ -1,4 +1,4 @@
-﻿using AxeHax.Core.Platform;
+using AxeHax.Core.Platform;
 
 namespace AxeHax.Core.Pipelines.Steps;
 
@@ -12,7 +12,6 @@ public class OutputElfStep : Step
         CommonStepInputs.ElfOutput,
     ];
 
-    public override float Progress { get; protected set; }
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         string elfOutput = this.Inputs.First().GetValueFromPipeline(this.Pipeline);

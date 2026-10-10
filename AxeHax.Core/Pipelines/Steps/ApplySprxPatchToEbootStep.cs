@@ -7,7 +7,6 @@ public class ApplySprxPatchToEbootStep : Step
     public ApplySprxPatchToEbootStep(Pipeline pipeline) : base(pipeline)
     {}
 
-    public override float Progress { get; protected set; }
     public override async Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         string? decryptedEbootPath = this.Game?.DecryptedEbootPath;

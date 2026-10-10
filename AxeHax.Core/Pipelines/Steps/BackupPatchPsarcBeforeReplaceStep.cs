@@ -7,7 +7,6 @@ public class BackupPatchPsarcBeforeReplaceStep : Step
     public BackupPatchPsarcBeforeReplaceStep(Pipeline pipeline) : base(pipeline)
     { }
 
-    public override float Progress { get; protected set; }
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         PatchAccessor.Try(this, () =>
@@ -18,10 +17,20 @@ public class BackupPatchPsarcBeforeReplaceStep : Step
             string psarc = Path.Combine(usrDir, "patch.psarc");
             string backup = Path.Combine(usrDir, "patch.psarc.orig");
 
-            if (!this.Pipeline.Accessor!.FileExists(backup))
+            if (this.Pipeline.Accessor?.FileExists(backup) ?? false)
+            {
+                State.Logger.LogInfo(
+                    InfoRetrieval,
+                    "{0} has already been backed up to {1}. Skipping backup.",
+                    psarc,
+                    backup
+                );
+                this.Progress = 1.0f;
+            }
+            else
             {
                 this.Progress = 0.5f;
-                this.Pipeline.Accessor.CopyFile(psarc, backup);
+                this.Pipeline.Accessor.MoveFile(psarc, backup);
             }
         });
 

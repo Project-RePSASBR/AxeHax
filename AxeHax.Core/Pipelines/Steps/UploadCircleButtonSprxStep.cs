@@ -9,7 +9,6 @@ public class UploadCircleButtonSprxStep : Step
     public UploadCircleButtonSprxStep(Pipeline pipeline) : base(pipeline)
     { }
 
-    public override float Progress { get; protected set; }
     public override async Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         await PatchAccessor.TryAsync(this, async () =>
@@ -29,23 +28,20 @@ public class UploadCircleButtonSprxStep : Step
 
             if (File.Exists(sprxName) && this.Platform.Ask(question) == QuestionResult.Yes)
             {
-                this.Pipeline.Accessor.UploadFile(sprxName, sprxPath);
+                await this.Pipeline.Accessor.UploadFileWithProgressAsync(sprxName, sprxPath, this, cancellationToken).ConfigureAwait(false);
             }
             else
             {
-                await using Stream writeStream = this.Pipeline.Accessor.OpenWrite(sprxPath);
-                await using Stream? readStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(sprxName);
+                await using Stream? resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(sprxName);
 
-                if (readStream == null)
+                if (resourceStream == null)
                 {
                     await this.Fail($"The sprx file for {this.Pipeline.Accessor.GetType().Name} is missing from this build! " +
                                     $"Please tell a developer on Discord/GitHub!");
-
                     return;
                 }
 
-                await readStream.CopyToAsync(writeStream, cancellationToken);
-                await writeStream.FlushAsync(cancellationToken);
+                await this.Pipeline.Accessor.UploadStreamWithProgressAsync(resourceStream, sprxPath, this, cancellationToken).ConfigureAwait(false);
             }
         });
     }

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using AxeHax.Core.Accessors;
 
 namespace AxeHax.Core.Pipelines.Steps;
@@ -8,7 +8,6 @@ public class GetConsoleIdpsStep : Step
     public GetConsoleIdpsStep(Pipeline pipeline) : base(pipeline)
     {}
 
-    public override float Progress { get; protected set; }
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         ConsolePatchAccessor? accessor = this.Pipeline.Accessor as ConsolePatchAccessor;

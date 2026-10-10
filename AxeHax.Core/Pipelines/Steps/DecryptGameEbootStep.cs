@@ -7,7 +7,6 @@ public class DecryptGameEbootStep : Step
     public DecryptGameEbootStep(Pipeline pipeline) : base(pipeline)
     {}
 
-    public override float Progress { get; protected set; }
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         LibSceToolSharp.PrintInfos(this.Game.DownloadedEbootPath!);

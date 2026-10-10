@@ -1,4 +1,4 @@
-﻿using AxeHax.Core.Accessors;
+using AxeHax.Core.Accessors;
 
 namespace AxeHax.Core.Pipelines.Steps;
 
@@ -7,7 +7,6 @@ public class RevertGameEbootFromBackupStep : Step
     public RevertGameEbootFromBackupStep(Pipeline pipeline) : base(pipeline)
     {}
 
-    public override float Progress { get; protected set; }
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         PatchAccessor.Try(this, () =>
@@ -33,7 +32,7 @@ public class RevertGameEbootFromBackupStep : Step
             }
 
             this.Progress = 0.75f;
-            this.Pipeline.Accessor.CopyFile(backup, eboot);
+            this.Pipeline.Accessor.MoveFile(backup, eboot);
         });
 
         this.Progress = 1.0f;

@@ -7,7 +7,6 @@ public class SetupPS3AccessorStep : Step
     public SetupPS3AccessorStep(Pipeline pipeline) : base(pipeline)
     {}
 
-    public override float Progress { get; protected set; }
 
     public override List<StepInput> Inputs { get; } = [
         CommonStepInputs.ConsoleIP,

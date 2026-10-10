@@ -7,7 +7,6 @@ public class ReadEbootContentIdStep : Step
     public ReadEbootContentIdStep(Pipeline pipeline) : base(pipeline)
     {}
 
-    public override float Progress { get; protected set; }
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         string ebootPath = this.Game.DownloadedEbootPath!;

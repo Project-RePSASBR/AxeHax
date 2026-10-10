@@ -8,7 +8,6 @@ public class PrepareEbootPatcherAndVerifyStep : Step
     public PrepareEbootPatcherAndVerifyStep(Pipeline pipeline) : base(pipeline)
     {}
 
-    public override float Progress { get; protected set; }
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         EbootPatcher patcher = new(File.Open(this.Game.DecryptedEbootPath!, FileMode.Open, FileAccess.ReadWrite), !this.Pipeline.UsesPsarcEncryption);
