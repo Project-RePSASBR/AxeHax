@@ -80,32 +80,50 @@ jobs:
         working-directory: AxeHax/bin/Release/net9.0/osx-universal2/publish/
         run: tar -czvf ../../../../../../AxeHax_for_macOS.tar.gz *.app
         
-      - name: Prepare Velopack
-        if: matrix.os != 'macos-latest'
-        run: |
-            dotnet tool install -g vpk
-            vpk download github --repoUrl https://github.com/${{ github.repository }}
-            
-      - name: Run vpk pack for Windows x64
+      - name: Package Windows x64 build
         if: matrix.os == 'windows-latest'
-        shell: bash
+        shell: powershell
         run: |
-            vpk pack --channel windows-x64 --framework net9.0-x64-desktop --runtime win7-x64 --packId AxeHax --packVersion $VERSION --packDir ./publish --mainExe AxeHax.exe --packTitle AxeHax --packAuthors LittleBigRefresh
-            vpk upload github --channel windows-x64 --repoUrl https://github.com/${{ github.repository }} --merge --releaseName v$VERSION --tag v$VERSION --token ${{ secrets.GITHUB_TOKEN }}
-            
-      - name: Run vpk pack for Linux x64
+          Compress-Archive -Path .\publish\* -DestinationPath .\AxeHax_windows-x64.zip -Force
+
+      - name: Package Linux x64 build
         if: matrix.os == 'ubuntu-latest'
         shell: bash
         run: |
-            vpk pack --channel linux-x64 --runtime linux-x64 --packId AxeHax --packVersion $VERSION --packDir ./publish-x64 --mainExe AxeHax --packTitle AxeHax --packAuthors LittleBigRefresh
-            vpk upload github --channel linux-x64 --repoUrl https://github.com/${{ github.repository }} --merge --releaseName v$VERSION --tag v$VERSION --token ${{ secrets.GITHUB_TOKEN }}
-            
-      - name: Run vpk pack for Linux ARM64
+          zip -r AxeHax_linux-x64.zip publish-x64
+
+      - name: Package Linux ARM64 build
         if: matrix.os == 'ubuntu-latest'
         shell: bash
         run: |
-            vpk pack --channel linux-arm64 --runtime linux-arm64 --packId AxeHax --packVersion $VERSION --packDir ./publish-arm64 --mainExe AxeHax --packTitle AxeHax --packAuthors LittleBigRefresh
-            vpk upload github --channel linux-arm64 --repoUrl https://github.com/${{ github.repository }} --merge --releaseName v$VERSION --tag v$VERSION --token ${{ secrets.GITHUB_TOKEN }}
+          zip -r AxeHax_linux-arm64.zip publish-arm64
+
+      - name: Upload Windows x64 build
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: "AxeHax_windows-x64"
+          path: "AxeHax_windows-x64.zip"
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload Linux x64 build
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: "AxeHax_linux-x64"
+          path: "AxeHax_linux-x64.zip"
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload Linux ARM64 build
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: "AxeHax_linux-arm64"
+          path: "AxeHax_linux-arm64.zip"
+          if-no-files-found: error
+          retention-days: 1
 
       - name: Upload macOS universal2 build
         if: matrix.os == 'macos-latest'
@@ -122,25 +140,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download artifacts
+      - name: Download release artifacts
         id: download
         uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+          merge-multiple: true
 
-      - name: Create zip files
-        run: |
-            cd ${{steps.download.outputs.download-path}}
-            mv ${{steps.download.outputs.download-path}}/AxeHax_for_macOS/*.tar.gz .
-        
+      - name: List downloaded artifacts
+        run: ls -R release-artifacts
+
       - uses: ncipollo/release-action@v1.16.0
         name: "Create release"
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          draft: true
+          draft: false
           generateReleaseNotes: true
           allowUpdates: true
-          bodyFile: "RELEASE_NOTES.md"
-          omitBody: 'false'
-          omitBodyDuringUpdate: 'false'
+          artifactErrorsFailBuild: true
           artifacts: |
-            *.tar.gz
+            release-artifacts/*.zip
+            release-artifacts/*.tar.gz
