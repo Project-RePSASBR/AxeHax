@@ -33,7 +33,7 @@ jobs:
           dotnet-version: 9.0.x
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore --verbosity diagnostic
           
       - name: Set VERSION variable from tag
         if: ${{ contains(github.ref, 'refs/tags') }}
