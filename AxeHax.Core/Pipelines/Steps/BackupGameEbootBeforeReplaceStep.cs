@@ -5,7 +5,7 @@ namespace AxeHax.Core.Pipelines.Steps;
 public class BackupGameEbootBeforeReplaceStep : Step
 {
     public BackupGameEbootBeforeReplaceStep(Pipeline pipeline) : base(pipeline)
-    {}
+    { }
 
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
@@ -13,10 +13,10 @@ public class BackupGameEbootBeforeReplaceStep : Step
         {
             string titleId = this.Game.TitleId;
             string usrDir = $"game/{titleId}/USRDIR";
-        
+
             string eboot = Path.Combine(usrDir, "EBOOT.BIN");
             string backup = Path.Combine(usrDir, "EBOOT.BIN.ORIG");
-            
+
             if (this.Pipeline.Accessor?.FileExists(backup) ?? false)
             {
                 State.Logger.LogInfo(

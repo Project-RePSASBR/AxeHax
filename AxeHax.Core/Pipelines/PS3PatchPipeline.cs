@@ -1,4 +1,4 @@
-﻿using AxeHax.Core.Pipelines.Steps;
+using AxeHax.Core.Pipelines.Steps;
 
 namespace AxeHax.Core.Pipelines;
 

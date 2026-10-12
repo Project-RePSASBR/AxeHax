@@ -1,4 +1,4 @@
-﻿using Eto.Forms;
+using Eto.Forms;
 using AxeHax.UI.Items;
 
 namespace AxeHax.Extensions;

@@ -14,11 +14,11 @@ public class PrepareSceToolStep : Step
 
         SetRapDirectory(this.Encryption.LicenseDirectory!);
         SetRifPath(this.Encryption.LicenseDirectory!);
-        
-        if(this.Encryption.DownloadedActDatPath != null)
+
+        if (this.Encryption.DownloadedActDatPath != null)
             SetActDatFilePath(this.Encryption.DownloadedActDatPath);
-        
-        if(this.Encryption.ConsoleIdps != null)
+
+        if (this.Encryption.ConsoleIdps != null)
             SetIdpsKey(this.Encryption.ConsoleIdps);
 
         return Task.CompletedTask;

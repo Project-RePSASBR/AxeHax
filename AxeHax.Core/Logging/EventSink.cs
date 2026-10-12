@@ -1,4 +1,4 @@
-﻿using AxeHax.Core;
+using AxeHax.Core;
 using NotEnoughLogs;
 using NotEnoughLogs.Sinks;
 

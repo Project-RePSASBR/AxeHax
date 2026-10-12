@@ -6,7 +6,7 @@ namespace AxeHax.Core.Pipelines.Steps;
 public class GetConsoleIdpsStep : Step
 {
     public GetConsoleIdpsStep(Pipeline pipeline) : base(pipeline)
-    {}
+    { }
 
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {

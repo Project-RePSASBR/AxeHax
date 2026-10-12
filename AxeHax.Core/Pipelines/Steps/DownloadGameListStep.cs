@@ -6,7 +6,7 @@ namespace AxeHax.Core.Pipelines.Steps;
 public class DownloadGameListStep : Step
 {
     public DownloadGameListStep(Pipeline pipeline) : base(pipeline)
-    {}
+    { }
 
     public override async Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
@@ -22,7 +22,7 @@ public class DownloadGameListStep : Step
         foreach (string gamePath in games)
         {
             State.Logger.LogInfo(InfoRetrieval, $"Downloading information for game '{gamePath}'...");
-            
+
             GameInformation game = new()
             {
                 TitleId = Path.GetFileName(gamePath),
@@ -43,7 +43,7 @@ public class DownloadGameListStep : Step
 
                     break;
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     State.Logger.LogWarning(InfoRetrieval, $"Failed to get information for '{game.TitleId}'. {tries} tries remaining...");
                     State.Logger.LogWarning(InfoRetrieval, e.ToString());
@@ -59,11 +59,11 @@ public class DownloadGameListStep : Step
 
             if (isConsole)
                 await Task.Delay(100, cancellationToken);
-            
+
             this.Progress = i++ / (float)games.Count;
 
             List<string> filters = this.Pipeline.GameNameFilters.ToList();
-            if(filters.Count <= 0 || filters.Any(f => game.Name?.Contains(f, StringComparison.InvariantCultureIgnoreCase) ?? false))
+            if (filters.Count <= 0 || filters.Any(f => game.Name?.Contains(f, StringComparison.InvariantCultureIgnoreCase) ?? false))
                 this.Pipeline.GameList.Add(game);
         }
 

@@ -6,7 +6,7 @@ namespace AxeHax.Core.Pipelines.Steps;
 public class PrepareEbootPatcherAndVerifyStep : Step
 {
     public PrepareEbootPatcherAndVerifyStep(Pipeline pipeline) : base(pipeline)
-    {}
+    { }
 
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
@@ -24,7 +24,7 @@ public class PrepareEbootPatcherAndVerifyStep : Step
         {
             return this.Fail("There were errors while verifying the patch details against the EBOOT. Check the log for more information.");
         }
-        
+
         return Task.CompletedTask;
     }
 }

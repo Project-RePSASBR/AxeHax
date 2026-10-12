@@ -12,8 +12,8 @@ namespace AxeHax.Core.Pipelines.Steps;
 public class FakeEncryptGameEbootStep : Step
 {
     public FakeEncryptGameEbootStep(Pipeline pipeline) : base(pipeline)
-    {}
-    
+    { }
+
     private static ushort Swap16(ushort val) => (ushort)(((val & 0xFF00) >> 8) | ((val & 0x00FF) << 8));
     private static uint Swap32(uint val) =>
         ((val & 0xFF000000) >> 24) |
@@ -30,7 +30,7 @@ public class FakeEncryptGameEbootStep : Step
         ((val & 0x0000000000FF0000UL) << 24) |
         ((val & 0x000000000000FF00UL) << 40) |
         ((val & 0x00000000000000FFUL) << 56);
-    
+
     private static void WriteStruct<T>(Stream stream, T @struct) where T : struct
     {
         int size = Marshal.SizeOf<T>();
@@ -40,7 +40,7 @@ public class FakeEncryptGameEbootStep : Step
         Marshal.StructureToPtr(@struct, ptr, false);
         Marshal.Copy(ptr, buffer, 0, size);
         Marshal.FreeHGlobal(ptr);
-        
+
         stream.Write(buffer);
     }
 

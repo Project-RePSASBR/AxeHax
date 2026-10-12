@@ -5,7 +5,7 @@ namespace AxeHax.Core.Pipelines.Steps;
 public class ValidateGameStep : Step
 {
     public ValidateGameStep(Pipeline pipeline) : base(pipeline)
-    {}
+    { }
 
 
     public override List<StepInput> Inputs { get; } =
@@ -24,7 +24,7 @@ public class ValidateGameStep : Step
 
         if (!this.Pipeline.Accessor!.DirectoryExists(gamePath))
             this.Fail("The game directory does not exist. This usually means you haven't installed any updates for your game.");
-        
+
         this.Pipeline.GameInformation = new GameInformation
         {
             TitleId = titleId,

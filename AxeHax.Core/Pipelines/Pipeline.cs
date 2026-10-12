@@ -13,14 +13,14 @@ public abstract class Pipeline : IAccessesPlatform
 {
     public abstract string Id { get; }
     public abstract string Name { get; }
-    
+
     public readonly Dictionary<string, string> Inputs = [];
     public FrozenSet<StepInput> RequiredInputs { get; private set; } = null!;
 
     public IPlatformInterface Platform { get; private set; } = null!;
 
     internal List<GameInformation>? GameList { get; set; } = null;
-    
+
     public IPatcher? Patcher { get; internal set; }
     public PatchAccessor? Accessor { get; internal set; }
     public GameInformation? GameInformation { get; internal set; }
@@ -30,20 +30,20 @@ public abstract class Pipeline : IAccessesPlatform
     public virtual string? ShorthandUrlId => null;
 
     public virtual IEnumerable<string> GameNameFilters => [];
-    
+
     public PipelineState State { get; private set; } = PipelineState.NotStarted;
-    
+
     public float Progress
     {
         get
         {
             if (this.State == PipelineState.Finished)
                 return 1;
-            
+
             float completed = (this._currentStepIndex - 1) / (float)this._stepCount;
             float currentStep = this._currentStep?.Progress ?? 0f;
             float stepWeight = 1f / this._stepCount;
-            
+
             return completed + currentStep * stepWeight;
         }
     }
@@ -58,7 +58,7 @@ public abstract class Pipeline : IAccessesPlatform
 
     protected abstract List<Type> StepTypes { get; }
     private List<Step> _steps = [];
-    
+
     private int _stepCount;
     private byte _currentStepIndex;
     private Step? _currentStep;
@@ -68,15 +68,15 @@ public abstract class Pipeline : IAccessesPlatform
         this.Platform = platform;
 
         List<StepInput> requiredInputs = [];
-        
+
         this._steps = new List<Step>(this.StepTypes.Count + 1);
-        
-        if(this.SetupAccessorStepType != null)
+
+        if (this.SetupAccessorStepType != null)
             this.AddStep(requiredInputs, this.SetupAccessorStepType);
 
         foreach (Type type in this.StepTypes)
             this.AddStep(requiredInputs, type);
-        
+
         this.RequiredInputs = requiredInputs.DistinctBy(i => i.Id).ToFrozenSet();
     }
 
@@ -91,7 +91,7 @@ public abstract class Pipeline : IAccessesPlatform
         this._currentStep = null;
 
         this.Patcher = null;
-        if(this.Accessor is IDisposable disposable)
+        if (this.Accessor is IDisposable disposable)
             disposable.Dispose();
         this.Accessor = null;
         this.GameInformation = null;
@@ -131,8 +131,8 @@ public abstract class Pipeline : IAccessesPlatform
                 return;
             }
         }
-        
-        if(this.Inputs.Count != 0)
+
+        if (this.Inputs.Count != 0)
             GlobalState.Logger.LogTrace(LogType.Pipeline, "Pipeline inputs:");
         foreach ((string? key, string? value) in this.Inputs)
         {
@@ -148,7 +148,7 @@ public abstract class Pipeline : IAccessesPlatform
         {
             GlobalState.Logger.LogInfo(LogType.Pipeline, $"Pipeline {this.GetType().Name} finished!");
             this.State = PipelineState.Finished;
-        
+
             PreviousInputStorage.ApplyFromPipeline(this);
             PreviousInputStorage.Write();
         }
@@ -198,19 +198,19 @@ public abstract class Pipeline : IAccessesPlatform
             this.State = PipelineState.Error;
             throw new InvalidOperationException("Pipeline must be in a clean state before downloading games.");
         }
-        
-        if(this.SetupAccessorStepType == null)
+
+        if (this.SetupAccessorStepType == null)
             throw new InvalidOperationException("This pipeline doesn't have accessors configured.");
 
         List<Step> stepTypes = [
             (Step)Activator.CreateInstance(this.SetupAccessorStepType, this)!,
             new DownloadGameListStep(this),
         ];
-        
+
         this.State = PipelineState.Running;
-        
+
         await this.RunListOfSteps(stepTypes, cancellationToken);
-        
+
         this.Reset();
 
         // ReSharper disable once InvertIf
@@ -224,7 +224,7 @@ public abstract class Pipeline : IAccessesPlatform
 
         return this.GameList;
     }
-    
+
     public async Task ConnectAsync(CancellationToken cancellationToken = default)
     {
         if (this.State != PipelineState.NotStarted)
@@ -232,20 +232,20 @@ public abstract class Pipeline : IAccessesPlatform
             this.State = PipelineState.Error;
             throw new InvalidOperationException("Pipeline must be in a clean state before downloading games.");
         }
-        
-        if(this.SetupAccessorStepType == null)
+
+        if (this.SetupAccessorStepType == null)
             throw new InvalidOperationException("This pipeline doesn't have accessors configured.");
 
         List<Step> stepTypes = [
             (Step)Activator.CreateInstance(this.SetupAccessorStepType, this)!,
         ];
-        
+
         this.State = PipelineState.Running;
-        
+
         await this.RunListOfSteps(stepTypes, cancellationToken);
         this.Reset();
     }
-    
+
     public async Task RevertGamePatchAsync(CancellationToken cancellationToken = default)
     {
         if (this.State != PipelineState.NotStarted)
@@ -253,8 +253,8 @@ public abstract class Pipeline : IAccessesPlatform
             this.State = PipelineState.Error;
             throw new InvalidOperationException("Pipeline must be in a clean state before reverting the game patch.");
         }
-        
-        if(this.SetupAccessorStepType == null)
+
+        if (this.SetupAccessorStepType == null)
             throw new InvalidOperationException("This pipeline doesn't have accessors configured.");
 
         if (!this.ReplacesEboot)
@@ -268,11 +268,11 @@ public abstract class Pipeline : IAccessesPlatform
             new RevertGameEbootFromBackupStep(this),
             new RevertPatchPsarcFromBackupStep(this),
         ];
-        
+
         this.State = PipelineState.Running;
-        
+
         await this.RunListOfSteps(stepTypes, cancellationToken);
-        
+
         this.Reset();
     }
 

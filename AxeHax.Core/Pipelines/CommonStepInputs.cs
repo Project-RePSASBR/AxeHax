@@ -7,7 +7,7 @@ public static class CommonStepInputs
         Placeholder = "NPUA80662",
         Required = true,
     };
-    
+
     internal static readonly StepInput RPCS3Folder = new("hdd0-path", "RPCS3 dev_hdd0 folder", StepInputType.Directory)
     {
         // provide an example to Windows users.
@@ -17,25 +17,25 @@ public static class CommonStepInputs
         ShouldCauseGameDownloadWhenChanged = true,
         Required = true,
     };
-    
+
     internal static readonly StepInput ConsoleIP = new("ip", "Console IP", StepInputType.ConsoleIp)
     {
         Placeholder = "192.168.1.123",
         Required = true,
     };
-       
+
     internal static readonly StepInput ElfInput = new("elf-input", "Input .ELF", StepInputType.OpenFile)
     {
         Placeholder = @"C:\path\to\EBOOT.elf",
         Required = true,
     };
-    
+
     internal static readonly StepInput ElfOutput = new("elf-output", "Output .ELF", StepInputType.SaveFile)
     {
         Placeholder = @"C:\path\to\EBOOT.elf",
         Required = true,
     };
-    
+
     // TODO: Cache the last used location for easier entry
     private static string? DetermineDefaultRpcs3Path()
     {
@@ -48,7 +48,7 @@ public static class CommonStepInputs
 
         if (Directory.Exists(folder))
             return folder;
-        
+
         return null;
     }
 }

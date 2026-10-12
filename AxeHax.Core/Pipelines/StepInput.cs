@@ -22,7 +22,7 @@ public class StepInput
     public string GetValueFromPipeline(Pipeline pipeline)
     {
         bool success = pipeline.Inputs.TryGetValue(this.Id, out string? input);
-        if(!success)
+        if (!success)
             throw new Exception($"Input {this.Id} was not provided to the pipeline before execution.");
 
         return input!;

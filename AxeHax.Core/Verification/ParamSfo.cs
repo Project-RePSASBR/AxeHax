@@ -10,7 +10,7 @@ public class ParamSfo
 
     public uint Version;
 
-    public Dictionary<string, object> Table { get; set; }= new();
+    public Dictionary<string, object> Table { get; set; } = new();
 
     // https://psdevwiki.com/ps3/PARAM.SFO#Internal_Structure
     public ParamSfo(Stream stream)
@@ -21,7 +21,7 @@ public class ParamSfo
         ReadOnlySpan<byte> headerToMatch = "\0PSF"u8;
 
         byte[] header = reader.ReadBytes(4);
-        
+
         // ReSharper disable once LoopCanBeConvertedToQuery
         for (int i = 0; i < header.Length; i++)
         {
@@ -34,12 +34,12 @@ public class ParamSfo
         }
 
         this.Version = reader.ReadUInt32();
-        
+
         uint keyTableStart = reader.ReadUInt32();
         uint dataTableStart = reader.ReadUInt32();
-        
+
         uint tableEntries = reader.ReadUInt32(); // Number of pairs in dictionary
-        
+
         for (uint i = 0; i < tableEntries; i++)
         {
             ushort keyOffset = reader.ReadUInt16();
@@ -54,11 +54,11 @@ public class ParamSfo
 
             stream.Position = keyTableStart + keyOffset;
             string name = string.Empty;
-            while(true)
+            while (true)
             {
                 char c = (char)reader.ReadByte();
                 if (c == '\0') break;
-                
+
                 name += c;
             }
 
@@ -73,13 +73,13 @@ public class ParamSfo
                     value = Encoding.Default.GetString(reader.ReadBytes((int)dataLength - 1));
                     break;
                 case 4: // int32
-                    // TODO (im lazy)
+                        // TODO (im lazy)
                 case 0: // utf8-s, binary i assume
                 default:
                     value = reader.ReadBytes((int)dataLength);
                     break;
             }
-            
+
             this.Table[name] = value;
 
             stream.Position = oldPosition;

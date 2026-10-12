@@ -5,7 +5,7 @@ namespace AxeHax.Core.Pipelines.Steps;
 public class ApplySprxPatchToEbootStep : Step
 {
     public ApplySprxPatchToEbootStep(Pipeline pipeline) : base(pipeline)
-    {}
+    { }
 
     public override async Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
@@ -18,9 +18,9 @@ public class ApplySprxPatchToEbootStep : Step
         // dispose early to avoid errors while writing in-place
         // above ctor consumes whole stream without reading again
         await stream.DisposeAsync();
-        
+
         this.Progress = 0.5f;
-        
+
         elf.SprxPath = "/dev_hdd0/plugins/CircleButton.sprx";
 
         // writing requires read permissions for PPU hash calculation

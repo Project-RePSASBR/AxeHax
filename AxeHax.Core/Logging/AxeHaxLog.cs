@@ -1,4 +1,4 @@
-﻿using NotEnoughLogs;
+using NotEnoughLogs;
 
 namespace AxeHax.Core.Logging;
 

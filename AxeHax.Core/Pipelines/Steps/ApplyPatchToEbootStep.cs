@@ -3,7 +3,7 @@ namespace AxeHax.Core.Pipelines.Steps;
 public class ApplyPatchToEbootStep : Step
 {
     public ApplyPatchToEbootStep(Pipeline pipeline) : base(pipeline)
-    {}
+    { }
 
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {

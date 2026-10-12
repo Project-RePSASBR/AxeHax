@@ -6,13 +6,13 @@ namespace AxeHax.Core.Pipelines.Steps;
 public class DownloadIconStep : Step
 {
     public DownloadIconStep(Pipeline pipeline) : base(pipeline)
-    {}
+    { }
 
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         GameInformation game = this.Game;
         string gamePath = $"game/{game.TitleId}";
-        
+
         string iconPath = Path.Combine(gamePath, "ICON0.PNG");
         if (!GameCacheStorage.IconExistsInCache(game.TitleId) && this.Pipeline.Accessor!.FileExists(iconPath))
         {

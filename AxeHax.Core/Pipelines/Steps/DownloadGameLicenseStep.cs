@@ -5,13 +5,13 @@ namespace AxeHax.Core.Pipelines.Steps;
 public class DownloadGameLicenseStep : Step
 {
     public DownloadGameLicenseStep(Pipeline pipeline) : base(pipeline)
-    {}
+    { }
 
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
         GameInformation game = this.Game;
         string? contentId = game.ContentId;
-        
+
         string licenseDir = Path.Join(Path.GetTempPath(), "axehax-" + Random.Shared.Next());
         Directory.CreateDirectory(licenseDir);
 
@@ -19,7 +19,7 @@ public class DownloadGameLicenseStep : Step
         {
             LicenseDirectory = licenseDir,
         };
-        
+
         bool found = false;
         foreach (string user in this.Pipeline.Accessor!.GetDirectoriesInDirectory(Path.Combine("home")))
         {
@@ -31,17 +31,17 @@ public class DownloadGameLicenseStep : Step
                 State.Logger.LogDebug(Crypto, $"Exdata folder doesn't exist for user {user}, skipping...");
                 continue;
             }
-            
+
             foreach (string licenseFile in this.Pipeline.Accessor.GetFilesInDirectory(exdataFolder))
             {
                 //If the license file does not contain the content ID or the title ID in its path, skip it
                 if (!(contentId != null && licenseFile.Contains(contentId)) && !licenseFile.Contains(game.TitleId))
                     continue;
-                
+
                 State.Logger.LogDebug(Crypto, $"Found compatible rap: {licenseFile}");
 
                 string actDatPath = Path.Combine(user, "exdata", "act.dat");
-                    
+
                 //If it is a valid content id, lets download that user's act.dat, if its there
                 if (!found && this.Pipeline.Accessor.FileExists(actDatPath))
                 {
@@ -55,11 +55,11 @@ public class DownloadGameLicenseStep : Step
 
                 State.Logger.LogInfo(Crypto, $"Downloaded compatible license file {licenseFile}.");
 
-                if(Path.GetFileNameWithoutExtension(licenseFile) == game.ContentId) 
+                if (Path.GetFileNameWithoutExtension(licenseFile) == game.ContentId)
                     found = true;
             }
 
-            if (found) 
+            if (found)
                 break;
         }
 
@@ -73,7 +73,7 @@ public class DownloadGameLicenseStep : Step
         {
             this.Game.ShouldUseNpdrmEncryption = true;
         }
-        
+
         return Task.CompletedTask;
     }
 }

@@ -5,7 +5,7 @@ namespace AxeHax.Core.Pipelines.Steps;
 public class OutputElfStep : Step
 {
     public OutputElfStep(Pipeline pipeline) : base(pipeline)
-    {}
+    { }
 
     public override List<StepInput> Inputs =>
     [

@@ -26,16 +26,16 @@ public partial class EbootPatcher : IPatcher
         if (!stream.CanRead || !stream.CanSeek || !stream.CanWrite)
             throw new ArgumentException("Stream must be readable, seekable and writable", nameof(stream));
 
-        this.Stream = stream;
-        this.Stream.Position = 0;
         this.NoEncryptPsarcs = noEncryptPsarcs;
-
         this._arcInfoPatchTarget = FindPatchableElement(stream, _arcInfoMarker);
         if (this.NoEncryptPsarcs)
             this._decryptPatchTarget = FindPatchableElement(stream, _psarcDecryptMarker);
+
+        this.Stream = stream;
+        this.Stream.Position = 0;
     }
 
-    public Stream Stream { get; private set;  }
+    public Stream Stream { get; private set; }
     public bool NoEncryptPsarcs { get; private set; }
 
     private static long? FindPatchableElement(Stream file, string patchMarker)
@@ -43,6 +43,7 @@ public partial class EbootPatcher : IPatcher
         long? patchTarget = null;
         long start = Stopwatch.GetTimestamp();
 
+        file.Position = 0;
         BufferedStream bufferedStream = new(file, 4 * 1024);
         BinaryReader reader = new(bufferedStream);
         Span<byte> buffer = new byte[4 * 1024];

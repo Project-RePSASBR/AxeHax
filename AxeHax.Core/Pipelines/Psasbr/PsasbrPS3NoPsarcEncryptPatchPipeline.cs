@@ -4,8 +4,8 @@ namespace AxeHax.Core.Pipelines.Psasbr;
 
 public class PsasbrPS3NoPsarcEncryptPatchPipeline : Pipeline
 {
-    public override string Id => "psasbr-ps3-patch";
-    public override string Name => "PSASBR PS3 Patch";
+    public override string Id => "psasbr-ps3-patch-no-encrypt";
+    public override string Name => "PSASBR PS3 Patch (No PSARC Encryption)";
 
     protected override Type SetupAccessorStepType => typeof(SetupPS3AccessorStep);
     public override bool ReplacesEboot => true;

@@ -1,1 +1,1 @@
-﻿global using static AxeHax.Core.LogType;
+global using static AxeHax.Core.LogType;

@@ -1,4 +1,4 @@
-﻿namespace AxeHax.Core.Storage;
+namespace AxeHax.Core.Storage;
 
 public static class GameCacheStorage
 {

@@ -1,4 +1,4 @@
-﻿using Eto.Drawing;
+using Eto.Drawing;
 using Eto.Forms;
 using System.Runtime.InteropServices;
 using AxeHax.Core;

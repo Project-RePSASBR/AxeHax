@@ -1,4 +1,4 @@
-﻿using AxeHax.Core.Pipelines;
+using AxeHax.Core.Pipelines;
 
 namespace AxeHax.Core.Storage;
 

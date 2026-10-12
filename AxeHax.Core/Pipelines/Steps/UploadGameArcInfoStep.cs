@@ -17,7 +17,7 @@ public class UploadGameArcInfoStep : Step
             const string arcInfoName = "arc.info";
 
             string arcInfoPath = Path.Combine(usrDir, arcInfoName);
-            
+
             if (this.Pipeline.Accessor!.FileExists(arcInfoPath))
                 this.Pipeline.Accessor.RemoveFile(arcInfoPath);
 

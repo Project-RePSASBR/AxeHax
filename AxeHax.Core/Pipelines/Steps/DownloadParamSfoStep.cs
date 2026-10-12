@@ -7,7 +7,7 @@ namespace AxeHax.Core.Pipelines.Steps;
 public class DownloadParamSfoStep : Step
 {
     public DownloadParamSfoStep(Pipeline pipeline) : base(pipeline)
-    {}
+    { }
 
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
@@ -19,11 +19,11 @@ public class DownloadParamSfoStep : Step
         {
             string sfoLocation = $"{gamePath}/PARAM.SFO";
 
-            if(this.Pipeline.Accessor!.FileExists(sfoLocation)) 
+            if (this.Pipeline.Accessor!.FileExists(sfoLocation))
                 sfoStream = this.Pipeline.Accessor.OpenRead(sfoLocation);
         });
-        
-        if(this.Failed)
+
+        if (this.Failed)
             return Task.CompletedTask;
 
         ParamSfo? sfo = null;
@@ -31,7 +31,7 @@ public class DownloadParamSfoStep : Step
         {
             if (sfoStream == null)
             {
-                if(game.TitleId != "TEST12345")
+                if (game.TitleId != "TEST12345")
                     State.Logger.LogWarning(InfoRetrieval, "The PARAM.SFO file does not exist. This usually means you haven't installed any updates for your game. AxeHax will try to proceed anyways.");
 
                 return Task.CompletedTask;
@@ -49,10 +49,10 @@ public class DownloadParamSfoStep : Step
             game.Name = $"Unknown PARAM.SFO [{game}]";
             this.Platform.WarnPrompt($"Couldn't load {game}'s PARAM.SFO because the game was missing simple title information. " + e.Message);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             game.Name = $"Unknown PARAM.SFO [{game}]";
-                
+
             this.Platform.WarnPrompt($"Couldn't load {game}'s PARAM.SFO: {e}\n\nAxeHax will try to proceed anyways.");
             if (sfo != null)
             {
@@ -66,7 +66,7 @@ public class DownloadParamSfoStep : Step
             {
                 State.Logger.LogWarning(InfoRetrieval, "PARAM.SFO was not read, can't dump to log");
             }
-                
+
             SentrySdk.CaptureException(e);
         }
 

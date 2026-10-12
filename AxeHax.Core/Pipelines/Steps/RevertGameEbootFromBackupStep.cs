@@ -5,7 +5,7 @@ namespace AxeHax.Core.Pipelines.Steps;
 public class RevertGameEbootFromBackupStep : Step
 {
     public RevertGameEbootFromBackupStep(Pipeline pipeline) : base(pipeline)
-    {}
+    { }
 
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
@@ -13,7 +13,7 @@ public class RevertGameEbootFromBackupStep : Step
         {
             string titleId = this.Game.TitleId;
             string usrDir = $"game/{titleId}/USRDIR";
-        
+
             string eboot = Path.Combine(usrDir, "EBOOT.BIN");
             string backup = Path.Combine(usrDir, "EBOOT.BIN.ORIG");
 
@@ -22,7 +22,7 @@ public class RevertGameEbootFromBackupStep : Step
                 this.Fail("The original backup couldn't be found. Is your game unpatched?");
                 return;
             }
-            
+
             this.Progress = 0.25f;
 
             if (this.Pipeline.Accessor!.FileExists(eboot))

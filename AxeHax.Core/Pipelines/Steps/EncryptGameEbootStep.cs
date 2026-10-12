@@ -5,7 +5,7 @@ namespace AxeHax.Core.Pipelines.Steps;
 public class EncryptGameEbootStep : Step
 {
     public EncryptGameEbootStep(Pipeline pipeline) : base(pipeline)
-    {}
+    { }
 
     public override Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
@@ -20,16 +20,16 @@ public class EncryptGameEbootStep : Step
             State.Logger.LogDebug(Crypto, "Will encrypt using Disc");
             LibSceToolSharp.SetDiscEncryptOptions();
         }
-        
+
         string tempFile = this.Game.EncryptedEbootPath = Path.GetTempFileName();
         LibSceToolSharp.Encrypt(this.Game.DecryptedEbootPath!, tempFile);
-        
+
         // HACK: scetool doesn't give us result codes, check if the file has been written to instead
         if (new FileInfo(tempFile).Length == 0)
         {
             return this.Fail("Encryption failed.");
         }
-        
+
         return Task.CompletedTask;
     }
 }

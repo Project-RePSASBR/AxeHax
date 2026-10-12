@@ -1,4 +1,4 @@
-﻿namespace AxeHax.Core.Platform;
+namespace AxeHax.Core.Platform;
 
 public abstract class LoggingPlatformInterface : IPlatformInterface
 {
@@ -24,6 +24,6 @@ public abstract class LoggingPlatformInterface : IPlatformInterface
         State.Logger.LogInfo(LogType.Platform, $"Opening URL {uri}");
     }
 
-    public virtual void PrepareThread() {}
-    public virtual void PrepareStopThread() {}
+    public virtual void PrepareThread() { }
+    public virtual void PrepareStopThread() { }
 }

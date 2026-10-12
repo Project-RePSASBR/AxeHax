@@ -4,8 +4,8 @@ namespace AxeHax.Core.Pipelines.Psasbr;
 
 public class PsasbrRPCS3NoPsarcEncryptPatchPipeline : Pipeline
 {
-    public override string Id => "psasbr-rpcs3-patch";
-    public override string Name => "PSASBR RPCS3 Patch";
+    public override string Id => "psasbr-rpcs3-patch-no-encrypt";
+    public override string Name => "PSASBR RPCS3 Patch (No PSARC Encryption)";
 
     protected override Type SetupAccessorStepType => typeof(SetupEmulatorAccessorStep);
     public override bool ReplacesEboot => true;

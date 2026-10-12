@@ -1,4 +1,4 @@
-﻿namespace AxeHax.Core.Platform;
+namespace AxeHax.Core.Platform;
 
 public interface IAccessesPlatform
 {

@@ -22,7 +22,7 @@ public class Program
         State.InitializeLogger([new ConsoleSink(), new EventSink()]);
 
         State.Logger.LogInfo(
-            OSIntegration, 
+            OSIntegration,
             $"AxeHax launched with args [{string.Join(',', args)}] (count: {args.Length})"
         );
         bool isCliInvocation = (

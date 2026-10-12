@@ -14,9 +14,9 @@ public class UploadGameEbootStep : Step
         {
             string titleId = this.Game.TitleId;
             string usrDir = $"game/{titleId}/USRDIR/";
-        
+
             string eboot = Path.Combine(usrDir, "EBOOT.BIN");
-            
+
             if (this.Pipeline.Accessor!.FileExists(eboot))
                 this.Pipeline.Accessor.RemoveFile(eboot);
 

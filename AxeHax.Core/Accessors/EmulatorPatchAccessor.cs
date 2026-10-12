@@ -1,4 +1,4 @@
-﻿namespace AxeHax.Core.Accessors;
+namespace AxeHax.Core.Accessors;
 
 public class EmulatorPatchAccessor : PatchAccessor
 {

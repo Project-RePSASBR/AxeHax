@@ -9,9 +9,9 @@ public sealed class PipelineController : IAccessesPlatform
 {
     private readonly Pipeline _pipeline;
     private readonly Action<Action> _uiThread;
-    
+
     private CancellationTokenSource? _cts;
-    
+
     public IPlatformInterface Platform => this._pipeline.Platform;
 
     public PipelineController(Pipeline pipeline, Action<Action> uiThread)
@@ -23,7 +23,7 @@ public sealed class PipelineController : IAccessesPlatform
     public bool PipelineRunning => this._cts != null;
 
     public bool EnableControls => this._pipeline.State != PipelineState.Running;
-    
+
     public string MainButtonText => this._pipeline.State switch
     {
         PipelineState.NotStarted => "Patch!",
@@ -48,12 +48,12 @@ public sealed class PipelineController : IAccessesPlatform
         }
 
         this._cts = new CancellationTokenSource();
-        
+
         if (this._pipeline.State is PipelineState.Cancelled or PipelineState.Error or PipelineState.Finished)
         {
             this._pipeline.Reset();
         }
-        
+
         Task.Run(async () =>
         {
             try

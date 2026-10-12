@@ -1,4 +1,4 @@
-﻿namespace AxeHax.Core;
+namespace AxeHax.Core;
 
 public enum LogType : byte
 {
