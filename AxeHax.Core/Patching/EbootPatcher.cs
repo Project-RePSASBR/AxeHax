@@ -17,6 +17,8 @@ public partial class EbootPatcher : IPatcher
     private readonly long? _arcInfoPatchTarget = null;
     private bool _isDisposed = false;
 
+    public bool GenerateRpcs3Patch = false;
+    public string? Rpcs3PatchFolder = null;
     public string? GameVersion = null;
     public string? GameName;
     public string? TitleId;
@@ -64,6 +66,38 @@ public partial class EbootPatcher : IPatcher
         long end = Stopwatch.GetTimestamp();
         State.Logger.LogDebug(Patcher, $"Detecting patchables took {(end - start) / (double)Stopwatch.Frequency} seconds!");
         return patchTarget;
+    }
+
+    public static string GeneratePpuHash(Stream stream)
+    {
+        stream.Position = 0;
+        ELF<ulong> elfFile = ELFReader.Load<ulong>(stream, false);
+
+        using SHA1 hash = SHA1.Create();
+        foreach (Segment<ulong>? segment in elfFile.Segments)
+        {
+            hash.TransformBlock(BitConverter.GetBytes(BinaryPrimitives.ReverseEndianness((uint)segment.Type)), 0, 4, null, 0);
+            hash.TransformBlock(BitConverter.GetBytes(BinaryPrimitives.ReverseEndianness((uint)segment.Flags)), 0, 4, null, 0);
+
+            if (segment.Type != SegmentType.Load || segment.Size == 0) continue;
+
+            hash.TransformBlock(BitConverter.GetBytes(BinaryPrimitives.ReverseEndianness(segment.Address)), 0, 8, null, 0);
+            hash.TransformBlock(BitConverter.GetBytes(BinaryPrimitives.ReverseEndianness(segment.Size)), 0, 8, null, 0);
+
+            byte[]? segmentData = segment.GetFileContents();
+
+            hash.TransformBlock(segmentData, 0, segmentData.Length, null, 0);
+        }
+
+        // trigger generation of hash after reading segments
+        hash.TransformFinalBlock([], 0, 0);
+
+        stream.Position = 0;
+
+        string ppuHash = BitConverter.ToString(hash.Hash!).Replace("-", "").ToLower();
+
+        State.Logger.LogDebug(PPU, $"PPU hash: PPU-{ppuHash}");
+        return ppuHash;
     }
 
     /// <summary>
@@ -116,7 +150,7 @@ public partial class EbootPatcher : IPatcher
         if (this.NoEncryptPsarcs && this._decryptPatchTarget == null)
             throw new ArgumentException("DecryptPsarcs patchable element string not found in provided EBOOT stream!");
 
-        using (BinaryWriter writer = new BinaryWriter(Stream))
+        using (BinaryWriter writer = new BinaryWriter(this.Stream, Encoding.UTF8, leaveOpen: true))
         {
             writer.BaseStream.Seek(
                 this._arcInfoPatchTarget.GetValueOrDefault() + _arcInfoMarker.Length,
@@ -134,6 +168,53 @@ public partial class EbootPatcher : IPatcher
                 );
                 writer.Write((byte)0);
             }
+
+            writer.Flush();
+        }
+
+        if (this.GenerateRpcs3Patch)
+        {
+            Debug.Assert(this.Rpcs3PatchFolder != null);
+            Debug.Assert(this.GameName != null);
+            Debug.Assert(this.TitleId != null);
+            Debug.Assert(!string.IsNullOrEmpty(this.GameVersion));
+
+            this.Stream.Position = 0;
+            string ppuHash = GeneratePpuHash(this.Stream);
+            string patchesFile = Path.Combine(this.Rpcs3PatchFolder, "imported_patch.yml");
+            if (!File.Exists(patchesFile))
+                File.WriteAllText(patchesFile, "Version: 1.2\n\n");
+
+            string patchTemplate = $"""
+                                   PPU-{ppuHash}:
+                                     "AxeHax Patch (LAN Lobby)":
+                                       Games:
+                                         "{this.GameName.ReplaceLineEndings(string.Empty)}":
+                                           {this.TitleId}: [ {this.GameVersion} ]
+                                      Author: AxeHax (automated)"
+                                      Notes: "This patches the game to allow LAN lobbies to work with RPCS3."
+                                      Patch Version:
+                                      Patch:
+                                       # HostLANLobby
+                                       - [ calloc, 0x00313354, 5 ]
+                                       - [ be32, 0x0, 0xf821fc41 ]   # stdu r1,-0x3c0(r1)
+                                       - [ be32, 0x0, 0x3d600228 ]   # lis  r11,0x0228
+                                       - [ be32, 0x0, 0x396b70c4 ]   # addi r11,r11,0x70c4
+                                       - [ be32, 0x0, 0x39800001 ]   # li   r12,1
+                                       - [ be32, 0x0, 0x998b0000 ]   # stb  r12,0(r11)
+                                       # JoinLANLobby
+                                       - [ calloc, 0x003136bc, 5 ]
+                                       - [ be32, 0x0, 0xf821ff41 ]   # stdu r1,-0xc0(r1)
+                                       - [ be32, 0x0, 0x3d600228 ]   # lis  r11,0x0228
+                                       - [ be32, 0x0, 0x396b70c4 ]   # addi r11,r11,0x70c4
+                                       - [ be32, 0x0, 0x39800000 ]   # li   r12,0
+                                       - [ be32, 0x0, 0x998b0000 ]   # stb  r12,0(r11)
+                                   """;
+
+            StringBuilder finalPatch = new();
+            finalPatch.AppendLine("");
+            finalPatch.AppendLine(patchTemplate);
+            File.AppendAllText(patchesFile, finalPatch.ToString());
         }
     }
 
