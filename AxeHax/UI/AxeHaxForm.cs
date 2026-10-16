@@ -25,16 +25,16 @@ public abstract class AxeHaxForm : Form
         catch (Exception ex)
         {
             // Not very important, so these should just be warnings, not errors
-            State.Logger.LogWarning(LogType.AxeHaxForm, $"Unhandled exception while loading AxeHax.ico in {this.GetType()}: {ex}");
+            State.Logger.LogWarning(LogType.AxeHaxForm, $"Unhandled exception while loading axehax.ico in {this.GetType()}: {ex}");
 
             // attempt to fall back to png icon
             try
             {
-                this.Icon = Icon.FromResource("AllStarsMatchmaker.png");
+                this.Icon = Icon.FromResource("axehax.png");
             }
             catch (Exception ex2)
             {
-                State.Logger.LogWarning(LogType.AxeHaxForm, $"Unhandled exception while loading AxeHax.png in {this.GetType()}: {ex2}");
+                State.Logger.LogWarning(LogType.AxeHaxForm, $"Unhandled exception while loading axehax.png in {this.GetType()}: {ex2}");
             }
         }
 

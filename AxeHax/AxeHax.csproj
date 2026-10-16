@@ -33,7 +33,7 @@
         <TargetFramework Condition="!$(IsWindows)">net9.0</TargetFramework>
         <TargetFramework Condition="$(IsWindows)">net9.0-windows</TargetFramework>
         <RuntimeIdentifiers Condition="$(IsOSX)">osx-x64;osx-arm64</RuntimeIdentifiers>
-        <ApplicationIcon>Resources\AllStarsMatchmaker.ico</ApplicationIcon>
+        <ApplicationIcon>Resources\axehax.ico</ApplicationIcon>
         <BuiltInComInteropSupport Condition="'$(TargetFramework)' == 'net9.0-windows'">true</BuiltInComInteropSupport>
         <IncludeNativeLibrariesForSelfExtract Condition="$(IsWindows)">true</IncludeNativeLibrariesForSelfExtract>
         <DebugType>embedded</DebugType>
@@ -51,11 +51,6 @@
       <PackageReference Condition="$(IsOSX)" Include="Eto.Platform.Mac64" Version="2.9.0" />
       <PackageReference Condition="$(IsWindows)" Include="Eto.Platform.Wpf" Version="2.9.0" />
       <PackageReference Include="Velopack" Version="1.2.0" />
-    </ItemGroup>
-    
-    <ItemGroup>
-        <EmbeddedResource Include="Resources\AllStarsMatchmaker.ico" LogicalName="AllStarsMatchmaker.ico" />
-        <EmbeddedResource Include="Resources\AllStarsMatchmaker.png" LogicalName="AllStarsMatchmaker.png" />
     </ItemGroup>
 
     <ItemGroup>
