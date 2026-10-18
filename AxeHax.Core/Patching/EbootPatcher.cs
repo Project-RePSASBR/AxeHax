@@ -191,24 +191,24 @@ public partial class EbootPatcher : IPatcher
                                        Games:
                                          "{this.GameName.ReplaceLineEndings(string.Empty)}":
                                            {this.TitleId}: [ {this.GameVersion} ]
-                                      Author: AxeHax (automated)"
-                                      Notes: "This patches the game to allow LAN lobbies to work with RPCS3."
-                                      Patch Version:
-                                      Patch:
-                                       # HostLANLobby
-                                       - [ calloc, 0x00313354, 5 ]
-                                       - [ be32, 0x0, 0xf821fc41 ]   # stdu r1,-0x3c0(r1)
-                                       - [ be32, 0x0, 0x3d600228 ]   # lis  r11,0x0228
-                                       - [ be32, 0x0, 0x396b70c4 ]   # addi r11,r11,0x70c4
-                                       - [ be32, 0x0, 0x39800001 ]   # li   r12,1
-                                       - [ be32, 0x0, 0x998b0000 ]   # stb  r12,0(r11)
-                                       # JoinLANLobby
-                                       - [ calloc, 0x003136bc, 5 ]
-                                       - [ be32, 0x0, 0xf821ff41 ]   # stdu r1,-0xc0(r1)
-                                       - [ be32, 0x0, 0x3d600228 ]   # lis  r11,0x0228
-                                       - [ be32, 0x0, 0x396b70c4 ]   # addi r11,r11,0x70c4
-                                       - [ be32, 0x0, 0x39800000 ]   # li   r12,0
-                                       - [ be32, 0x0, 0x998b0000 ]   # stb  r12,0(r11)
+                                        Author: AxeHax (automated)"
+                                        Notes: "This patches the game to allow LAN lobbies to work with RPCS3."
+                                        Patch Version:
+                                        Patch:
+                                        # HostLANLobby
+                                        - [ calloc, 0x00313354, 5 ]
+                                        - [ be32, 0x0, 0xf821fc41 ]   # stdu r1,-0x3c0(r1)
+                                        - [ be32, 0x0, 0x3d600228 ]   # lis  r11,0x0228
+                                        - [ be32, 0x0, 0x396b70c4 ]   # addi r11,r11,0x70c4
+                                        - [ be32, 0x0, 0x39800001 ]   # li   r12,1
+                                        - [ be32, 0x0, 0x998b0000 ]   # stb  r12,0(r11)
+                                        # JoinLANLobby
+                                        - [ calloc, 0x003136bc, 5 ]
+                                        - [ be32, 0x0, 0xf821ff41 ]   # stdu r1,-0xc0(r1)
+                                        - [ be32, 0x0, 0x3d600228 ]   # lis  r11,0x0228
+                                        - [ be32, 0x0, 0x396b70c4 ]   # addi r11,r11,0x70c4
+                                        - [ be32, 0x0, 0x39800000 ]   # li   r12,0
+                                        - [ be32, 0x0, 0x998b0000 ]   # stb  r12,0(r11)
                                    """;
 
             StringBuilder finalPatch = new();
