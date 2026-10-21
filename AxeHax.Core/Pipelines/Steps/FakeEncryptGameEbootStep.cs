@@ -62,7 +62,7 @@ public class FakeEncryptGameEbootStep : Step
 
         int fselfHeaderSize = Marshal.SizeOf<SceHeader>() + Marshal.SizeOf<SelfHeader>() + Marshal.SizeOf<AppInfo>();
 
-        ulong phdrOffset = Swap64(elfHeader.e_phoff) + (ulong)fselfHeaderSize;
+        ulong phdrOffset = Swap16(elfHeader.e_ehsize) + (ulong)fselfHeaderSize;
         ushort phdrCount = Swap16(elfHeader.e_phnum);
 
         ulong sectionInfoOffset = (ulong)fselfHeaderSize + Swap16(elfHeader.e_ehsize) + ((ulong)Swap16(elfHeader.e_phentsize) * phdrCount);
@@ -132,7 +132,8 @@ public class FakeEncryptGameEbootStep : Step
         WriteStruct(output, sceHeader);
         WriteStruct(output, selfHeader);
         WriteStruct(output, appInfo);
-        output.Write(elfData, 0, Swap16(elfHeader.e_ehsize) + (Swap16(elfHeader.e_phentsize) * phdrCount));
+        output.Write(elfData, 0, Swap16(elfHeader.e_ehsize));
+        output.Write(elfData, (int)Swap64(elfHeader.e_phoff), Swap16(elfHeader.e_phentsize) * phdrCount);
 
         foreach (SegmentInfo seg in segments)
             WriteStruct(output, seg);
